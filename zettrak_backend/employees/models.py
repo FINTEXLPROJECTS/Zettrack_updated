@@ -4,8 +4,8 @@ from companies.models import Company
 
 
 class Employee(models.Model):
-    company = models.ForeignKey(Company, on_delete=models.CASCADE)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='employees')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='employee_profile')
     employee_code = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100, blank=True, null=True)
@@ -15,4 +15,4 @@ class Employee(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.first_name
+        return f"{self.first_name} {self.last_name or ''}".strip()

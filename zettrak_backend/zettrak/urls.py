@@ -17,6 +17,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from django.contrib import admin
+from django.http import HttpResponse
+from django.urls import path, include
+
+
+def home(request):
+    return HttpResponse("ZetTrak backend is running successfully")
+
+
 urlpatterns = [
+    path('', home, name='home'),
     path('admin/', admin.site.urls),
+    path('api/v1/auth/', include('accounts.urls')),
+    path('api/v1/employees/', include('employees.urls')),
+    path('api/v1/attendance/', include('attendance.urls')),
+    path('api/v1/leaves/', include('leave_management.urls')),
 ]
