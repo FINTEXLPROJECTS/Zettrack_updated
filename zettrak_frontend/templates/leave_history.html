@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leave History</title>
+  <link rel="stylesheet" href="../static/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h2>Leave History</h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <nav class="navbar">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="employees.html">Employees</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="leaves.html">Leaves</a>
+    <a href="leave_history.html">Leave History</a>
+  </nav>
+
+  <main class="container">
+    <button class="secondary-btn" onclick="loadLeaveHistory()">Load Leave History</button>
+    <p id="leaveHistoryMsg" class="message"></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Employee</th>
+            <th>Leave Type</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="leaveHistoryTableBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = window.location.origin + "/api/v1/";
+
+    function authHeaders() {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("access")
+      };
+    }
+
+    function logout() {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      window.location.href = "login.html";
+    }
+
+    async function loadLeaveHistory() {
+      const tbody = document.getElementById("leaveHistoryTableBody");
+      const msg = document.getElementById("leaveHistoryMsg");
+      tbody.innerHTML = "";
+
+      try {
+        const response = await fetch(API_BASE + "leaves/history/", {
+          method: "GET",
+          headers: authHeaders()
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          msg.innerText = "Failed to load leave history";
+          return;
+        }
+
+        msg.innerText = "";
+
+        data.forEach(item => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.id ?? ""}</td>
+            <td>${item.employee ?? ""}</td>
+            <td>${item.leave_type ?? ""}</td>
+            <td>${item.start_date ?? ""}</td>
+            <td>${item.end_date ?? ""}</td>
+            <td>${item.status ?? ""}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        msg.innerText = "Server connection failed";
+      }
+    }
+  </script>
+</body>
+</html>

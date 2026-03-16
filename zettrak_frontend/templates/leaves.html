@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apply Leave</title>
+  <link rel="stylesheet" href="../static/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h2>Apply Leave</h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <nav class="navbar">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="employees.html">Employees</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="leaves.html">Leaves</a>
+    <a href="leave_history.html">Leave History</a>
+  </nav>
+
+  <main class="container">
+    <div class="form-grid">
+      <input type="number" id="leaveEmployee" placeholder="Employee ID" />
+      <input type="number" id="leaveType" placeholder="Leave Type ID" />
+      <input type="date" id="startDate" />
+      <input type="date" id="endDate" />
+      <textarea id="reason" placeholder="Reason"></textarea>
+    </div>
+
+    <button onclick="applyLeave()">Apply Leave</button>
+    <p id="leaveMsg" class="message"></p>
+  </main>
+
+  <script>
+    const API_BASE = window.location.origin + "/api/v1/";
+
+    function authHeaders() {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("access")
+      };
+    }
+
+    function logout() {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      window.location.href = "login.html";
+    }
+
+    async function applyLeave() {
+      const payload = {
+        employee: document.getElementById("leaveEmployee").value,
+        leave_type: document.getElementById("leaveType").value,
+        start_date: document.getElementById("startDate").value,
+        end_date: document.getElementById("endDate").value,
+        reason: document.getElementById("reason").value
+      };
+
+      const msg = document.getElementById("leaveMsg");
+
+      try {
+        const response = await fetch(API_BASE + "leaves/apply/", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          msg.innerText = "Leave apply failed";
+          return;
+        }
+
+        msg.innerText = "Leave applied successfully";
+      } catch (error) {
+        msg.innerText = "Server connection failed";
+      }
+    }
+  </script>
+</body>
+</html>

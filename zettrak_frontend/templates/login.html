@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak Login</title>
+  <link rel="stylesheet" href="../static/login.css" />
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <h1>ZetTrak</h1>
+      <p class="subtitle">HRMS Admin Login</p>
+
+      <input type="text" id="username" placeholder="Enter username" />
+      <input type="password" id="password" placeholder="Enter password" />
+
+      <button onclick="login()">Login</button>
+      <p id="loginMsg" class="message"></p>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin + "/api/v1/";
+
+    async function login() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const msg = document.getElementById("loginMsg");
+
+      try {
+        const response = await fetch(API_BASE + "auth/login/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            username: username,
+            password: password
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          msg.innerText = data.error || "Login failed";
+          return;
+        }
+
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
+
+        msg.innerText = "Login successful";
+        window.location.href = "dashboard.html";
+      } catch (error) {
+        msg.innerText = "Server connection failed";
+      }
+    }
+  </script>
+</body>
+</html>

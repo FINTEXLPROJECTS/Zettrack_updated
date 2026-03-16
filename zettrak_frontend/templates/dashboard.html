@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak Dashboard</title>
+  <link rel="stylesheet" href="../static/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h2>ZetTrak Admin Dashboard</h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <nav class="navbar">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="employees.html">Employees</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="leaves.html">Leaves</a>
+    <a href="leave_history.html">Leave History</a>
+  </nav>
+
+  <main class="container">
+    <h3>Welcome to ZetTrak HRMS</h3>
+
+    <div class="cards">
+      <div class="card">
+        <h4>Employees</h4>
+        <p>Manage employee details and records.</p>
+      </div>
+      <div class="card">
+        <h4>Attendance</h4>
+        <p>Check employee check-in and check-out data.</p>
+      </div>
+      <div class="card">
+        <h4>Leaves</h4>
+        <p>Apply and review leave requests.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>

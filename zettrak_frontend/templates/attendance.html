@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance</title>
+  <link rel="stylesheet" href="../static/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h2>Attendance</h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <nav class="navbar">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="employees.html">Employees</a>
+    <a href="attendance.html">Attendance</a>
+    <a href="leaves.html">Leaves</a>
+    <a href="leave_history.html">Leave History</a>
+  </nav>
+
+  <main class="container">
+    <input type="number" id="employeeId" placeholder="Employee ID" />
+
+    <div class="btn-row">
+      <button onclick="checkIn()">Check In</button>
+      <button onclick="checkOut()">Check Out</button>
+      <button class="secondary-btn" onclick="loadAttendanceHistory()">Load History</button>
+    </div>
+
+    <p id="attendanceMsg" class="message"></p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Check In</th>
+            <th>Check Out</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="attendanceTableBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = window.location.origin + "/api/v1/";
+
+    function authHeaders() {
+      return {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + localStorage.getItem("access")
+      };
+    }
+
+    function logout() {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      window.location.href = "login.html";
+    }
+
+    async function checkIn() {
+      const employee = document.getElementById("employeeId").value;
+      const msg = document.getElementById("attendanceMsg");
+
+      try {
+        const response = await fetch(API_BASE + "attendance/check-in/", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ employee })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          msg.innerText = data.error || "Check-in failed";
+          return;
+        }
+
+        msg.innerText = "Check-in successful";
+        loadAttendanceHistory();
+      } catch (error) {
+        msg.innerText = "Server connection failed";
+      }
+    }
+
+    async function checkOut() {
+      const employee = document.getElementById("employeeId").value;
+      const msg = document.getElementById("attendanceMsg");
+
+      try {
+        const response = await fetch(API_BASE + "attendance/check-out/", {
+          method: "POST",
+          headers: authHeaders(),
+          body: JSON.stringify({ employee })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          msg.innerText = data.error || "Check-out failed";
+          return;
+        }
+
+        msg.innerText = "Check-out successful";
+        loadAttendanceHistory();
+      } catch (error) {
+        msg.innerText = "Server connection failed";
+      }
+    }
+
+    async function loadAttendanceHistory() {
+      const tbody = document.getElementById("attendanceTableBody");
+      tbody.innerHTML = "";
+
+      try {
+        const response = await fetch(API_BASE + "attendance/history/", {
+          method: "GET",
+          headers: authHeaders()
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) return;
+
+        data.forEach(item => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.id ?? ""}</td>
+            <td>${item.employee ?? ""}</td>
+            <td>${item.date ?? ""}</td>
+            <td>${item.check_in ?? ""}</td>
+            <td>${item.check_out ?? ""}</td>
+            <td>${item.status ?? ""}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  </script>
+</body>
+</html>
