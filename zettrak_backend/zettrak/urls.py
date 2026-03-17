@@ -26,9 +26,17 @@ def home(request):
     return HttpResponse("ZetTrak backend is running successfully")
 
 
+
+from django.contrib import admin
+from django.urls import path, include
+
 urlpatterns = [
-    path('', home, name='home'),
     path('admin/', admin.site.urls),
+
+    # template pages
+    path('', include('accounts.urls')),
+
+    # api routes
     path('api/v1/auth/', include('accounts.urls')),
     path('api/v1/employees/', include('employees.urls')),
     path('api/v1/attendance/', include('attendance.urls')),

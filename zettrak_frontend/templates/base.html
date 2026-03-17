@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>ZetTrak</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'app.css' %}">
 </head>
 <body>
     <header>
@@ -15,6 +15,7 @@
         <a href="/employees-page/">Employees</a>
         <a href="/attendance-page/">Attendance</a>
         <a href="/leaves-page/">Leaves</a>
+        <a href="/leave-history-page/">Leave History</a>
         <a href="/admin/">Admin</a>
     </nav>
 
@@ -22,6 +23,6 @@
         {% block content %}{% endblock %}
     </div>
 
-    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'app.js' %}"></script>
 </body>
 </html>

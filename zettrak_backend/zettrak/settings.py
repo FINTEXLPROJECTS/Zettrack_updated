@@ -17,7 +17,7 @@ from decouple import config
 from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+PROJECT_ROOT = BASE_DIR.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -85,7 +85,7 @@ ROOT_URLCONF = 'zettrak.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+       'DIRS': [PROJECT_ROOT / 'zettrak_frontend' / 'templates']
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -172,9 +172,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    PROJECT_ROOT / 'zettrak_frontend' / 'static',
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = PROJECT_ROOT / 'staticfiles'
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
