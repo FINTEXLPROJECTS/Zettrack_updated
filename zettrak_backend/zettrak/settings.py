@@ -85,7 +85,7 @@ ROOT_URLCONF = 'zettrak.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-       'DIRS': [PROJECT_ROOT / 'zettrak_frontend' / 'templates']
+       'DIRS': [PROJECT_ROOT / 'zettrak_frontend' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
