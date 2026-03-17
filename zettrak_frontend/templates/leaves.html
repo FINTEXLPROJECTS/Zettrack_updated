@@ -3,35 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Apply Leave</title>
-  <link rel="stylesheet" href="../static/app.css" />
+  <title>ZetTrak - Apply Leave</title>
+  <link rel="stylesheet" href="/static/app.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h2>Apply Leave</h2>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </header>
 
-  <nav class="navbar">
-    <a href="/dashboard/">Dashboard</a>
-        <a href="/employees-page/">Employees</a>
-        <a href="/attendance-page/">Attendance</a>
-        <a href="/leaves-page/">Leaves</a>
-        <a href="/leave-history-page/">Leave History</a>
-        <a href="/admin/">Admin</a>
-  </nav>
-  <main class="container">
-    <div class="form-grid">
-      <input type="number" id="leaveEmployee" placeholder="Employee ID" />
-      <input type="number" id="leaveType" placeholder="Leave Type ID" />
-      <input type="date" id="startDate" />
-      <input type="date" id="endDate" />
-      <textarea id="reason" placeholder="Reason"></textarea>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-name">ZetTrak</div>
+      <div class="brand-sub">HRMS System</div>
     </div>
+    <nav class="sidebar-nav">
+      <a href="/dashboard/">
+        <span class="nav-icon">&#127968;</span> Dashboard
+      </a>
+      <a href="/employees-page/">
+        <span class="nav-icon">&#128101;</span> Employees
+      </a>
+      <a href="/attendance-page/">
+        <span class="nav-icon">&#128203;</span> Attendance
+      </a>
+      <a href="/leaves-page/" class="active">
+        <span class="nav-icon">&#127807;</span> Leaves
+      </a>
+      <a href="/leave-history-page/">
+        <span class="nav-icon">&#128202;</span> Leave History
+      </a>
+      <a href="/admin/">
+        <span class="nav-icon">&#9881;</span> Admin
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span>&#128682;</span> Logout
+      </button>
+    </div>
+  </aside>
 
-    <button onclick="applyLeave()">Apply Leave</button>
-    <p id="leaveMsg" class="message"></p>
-  </main>
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>Apply Leave</h2>
+        <p>Submit a new leave request</p>
+      </div>
+      <span class="topbar-badge">ZetTrak</span>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <div class="form-panel">
+        <div class="section-title">
+          <span>&#127807;</span> Leave Application Form
+        </div>
+        <div class="form-grid">
+          <input type="number" id="leaveEmployee" placeholder="Employee ID" />
+          <input type="number" id="leaveType" placeholder="Leave Type ID" />
+          <input type="date" id="startDate" placeholder="Start Date" />
+          <input type="date" id="endDate" placeholder="End Date" />
+          <textarea id="reason" placeholder="Reason for leave..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="applyLeave()">&#10003; Submit Leave</button>
+        </div>
+        <p id="leaveMsg" class="message"></p>
+      </div>
+
+    </main>
+  </div>
 
   <script>
     const API_BASE = window.location.origin + "/api/v1/";
@@ -46,7 +89,13 @@
     function logout() {
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
-      window.location.href = "login.html";
+      window.location.href = "/";
+    }
+
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("leaveMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
     }
 
     async function applyLeave() {
@@ -58,8 +107,6 @@
         reason: document.getElementById("reason").value
       };
 
-      const msg = document.getElementById("leaveMsg");
-
       try {
         const response = await fetch(API_BASE + "leaves/apply/", {
           method: "POST",
@@ -70,13 +117,13 @@
         const data = await response.json();
 
         if (!response.ok) {
-          msg.innerText = "Leave apply failed";
+          showMsg("Leave application failed", true);
           return;
         }
 
-        msg.innerText = "Leave applied successfully";
+        showMsg("Leave applied successfully");
       } catch (error) {
-        msg.innerText = "Server connection failed";
+        showMsg("Server connection failed", true);
       }
     }
   </script>
