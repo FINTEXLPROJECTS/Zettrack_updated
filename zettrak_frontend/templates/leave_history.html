@@ -3,44 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Leave History</title>
-  <link rel="stylesheet" href="../static/app.css" />
+  <title>ZetTrak - Leave History</title>
+  <link rel="stylesheet" href="/static/app.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h2>Leave History</h2>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </header>
 
-  <nav class="navbar">
-    <a href="/dashboard/">Dashboard</a>
-        <a href="/employees-page/">Employees</a>
-        <a href="/attendance-page/">Attendance</a>
-        <a href="/leaves-page/">Leaves</a>
-        <a href="/leave-history-page/">Leave History</a>
-        <a href="/admin/">Admin</a>
-  </nav>
-
-  <main class="container">
-    <button class="secondary-btn" onclick="loadLeaveHistory()">Load Leave History</button>
-    <p id="leaveHistoryMsg" class="message"></p>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Employee</th>
-            <th>Leave Type</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="leaveHistoryTableBody"></tbody>
-      </table>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-name">ZetTrak</div>
+      <div class="brand-sub">HRMS System</div>
     </div>
-  </main>
+    <nav class="sidebar-nav">
+      <a href="/dashboard/">
+        <span class="nav-icon">&#127968;</span> Dashboard
+      </a>
+      <a href="/employees-page/">
+        <span class="nav-icon">&#128101;</span> Employees
+      </a>
+      <a href="/attendance-page/">
+        <span class="nav-icon">&#128203;</span> Attendance
+      </a>
+      <a href="/leaves-page/">
+        <span class="nav-icon">&#127807;</span> Leaves
+      </a>
+      <a href="/leave-history-page/" class="active">
+        <span class="nav-icon">&#128202;</span> Leave History
+      </a>
+      <a href="/admin/">
+        <span class="nav-icon">&#9881;</span> Admin
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span>&#128682;</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>Leave History</h2>
+        <p>View all leave application records</p>
+      </div>
+      <span class="topbar-badge">ZetTrak</span>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <div class="form-panel">
+        <div class="section-title">
+          <span>&#128202;</span> Leave Records
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="loadLeaveHistory()">&#8635; Load Leave History</button>
+        </div>
+        <p id="leaveHistoryMsg" class="message"></p>
+      </div>
+
+      <div class="table-panel">
+        <div class="table-header">
+          <h4>&#128202; All Leave Applications</h4>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Employee</th>
+              <th>Leave Type</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="leaveHistoryTableBody">
+            <tr class="empty-row"><td colspan="6">Click "Load Leave History" to view records</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
 
   <script>
     const API_BASE = window.location.origin + "/api/v1/";
@@ -55,13 +103,18 @@
     function logout() {
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
-      window.location.href = "login.html";
+      window.location.href = "/";
+    }
+
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("leaveHistoryMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
     }
 
     async function loadLeaveHistory() {
       const tbody = document.getElementById("leaveHistoryTableBody");
-      const msg = document.getElementById("leaveHistoryMsg");
-      tbody.innerHTML = "";
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Loading...</td></tr>";
 
       try {
         const response = await fetch(API_BASE + "leaves/history/", {
@@ -72,12 +125,17 @@
         const data = await response.json();
 
         if (!response.ok) {
-          msg.innerText = "Failed to load leave history";
+          showMsg("Failed to load leave history", true);
+          tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Failed to load records</td></tr>";
           return;
         }
 
-        msg.innerText = "";
+        if (data.length === 0) {
+          tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>No leave records found</td></tr>";
+          return;
+        }
 
+        tbody.innerHTML = "";
         data.forEach(item => {
           const row = document.createElement("tr");
           row.innerHTML = `
@@ -91,7 +149,8 @@
           tbody.appendChild(row);
         });
       } catch (error) {
-        msg.innerText = "Server connection failed";
+        showMsg("Server connection failed", true);
+        tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Server connection failed</td></tr>";
       }
     }
   </script>

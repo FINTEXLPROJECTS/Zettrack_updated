@@ -3,48 +3,98 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZetTrak Dashboard</title>
-  <link rel="stylesheet" href="../static/app.css" />
+  <title>ZetTrak - Dashboard</title>
+  <link rel="stylesheet" href="/static/app.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h2>ZetTrak Admin Dashboard</h2>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </header>
 
-  <nav class="navbar">
-    <a href="/dashboard/">Dashboard</a>
-        <a href="/employees-page/">Employees</a>
-        <a href="/attendance-page/">Attendance</a>
-        <a href="/leaves-page/">Leaves</a>
-        <a href="/leave-history-page/">Leave History</a>
-        <a href="/admin/">Admin</a>
-  </nav>
-
-  <main class="container">
-    <h3>Welcome to ZetTrak HRMS</h3>
-
-    <div class="cards">
-      <div class="card">
-        <h4>Employees</h4>
-        <p>Manage employee details and records.</p>
-      </div>
-      <div class="card">
-        <h4>Attendance</h4>
-        <p>Check employee check-in and check-out data.</p>
-      </div>
-      <div class="card">
-        <h4>Leaves</h4>
-        <p>Apply and review leave requests.</p>
-      </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-name">ZetTrak</div>
+      <div class="brand-sub">HRMS System</div>
     </div>
-  </main>
+    <nav class="sidebar-nav">
+      <a href="/dashboard/" class="active">
+        <span class="nav-icon">&#127968;</span> Dashboard
+      </a>
+      <a href="/employees-page/">
+        <span class="nav-icon">&#128101;</span> Employees
+      </a>
+      <a href="/attendance-page/">
+        <span class="nav-icon">&#128203;</span> Attendance
+      </a>
+      <a href="/leaves-page/">
+        <span class="nav-icon">&#127807;</span> Leaves
+      </a>
+      <a href="/leave-history-page/">
+        <span class="nav-icon">&#128202;</span> Leave History
+      </a>
+      <a href="/admin/">
+        <span class="nav-icon">&#9881;</span> Admin
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span>&#128682;</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>Dashboard</h2>
+        <p>Welcome back to your HRMS panel</p>
+      </div>
+      <span class="topbar-badge">ZetTrak</span>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <div class="welcome-banner">
+        <div>
+          <h3>Welcome to ZetTrak HRMS</h3>
+          <p>Manage your workforce efficiently.<br>Track attendance, leaves, and employee records all in one place.</p>
+        </div>
+        <span class="welcome-icon">&#128188;</span>
+      </div>
+
+      <div class="cards">
+        <div class="card" onclick="window.location.href='/employees-page/'">
+          <span class="card-icon">&#128101;</span>
+          <h4>Employees</h4>
+          <p>Manage employee details, records, and profiles.</p>
+        </div>
+        <div class="card" onclick="window.location.href='/attendance-page/'">
+          <span class="card-icon">&#128203;</span>
+          <h4>Attendance</h4>
+          <p>Track employee check-in and check-out records daily.</p>
+        </div>
+        <div class="card" onclick="window.location.href='/leaves-page/'">
+          <span class="card-icon">&#127807;</span>
+          <h4>Leaves</h4>
+          <p>Apply and manage leave requests for employees.</p>
+        </div>
+        <div class="card" onclick="window.location.href='/leave-history-page/'">
+          <span class="card-icon">&#128202;</span>
+          <h4>Leave History</h4>
+          <p>View complete history of all leave applications.</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
 
   <script>
     function logout() {
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
-      window.location.href = "login.html";
+      window.location.href = "/";
     }
   </script>
 </body>

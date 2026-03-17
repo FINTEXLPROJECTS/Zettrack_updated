@@ -36,6 +36,10 @@ def leaves_page(request):
     return render(request, 'leaves.html')
 
 
+def leave_history_page(request):
+    return render(request, 'leave_history.html')
+
+
 class LoginView(APIView):
     permission_classes = []
 

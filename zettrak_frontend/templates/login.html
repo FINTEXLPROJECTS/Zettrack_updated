@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZetTrak Login</title>
-  <link rel="stylesheet" href="../static/login.css" />
+  <title>ZetTrak - Login</title>
+  <link rel="stylesheet" href="/static/login.css" />
 </head>
 <body>
   <div class="login-container">
     <div class="login-card">
+      <div class="login-logo">&#128188;</div>
       <h1>ZetTrak</h1>
       <p class="subtitle">HRMS Admin Login</p>
 
@@ -31,31 +32,34 @@
       try {
         const response = await fetch(API_BASE + "auth/login/", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            username: username,
-            password: password
-          })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
           msg.innerText = data.error || "Login failed";
+          msg.style.color = "#cc0000";
           return;
         }
 
         localStorage.setItem("access", data.access);
         localStorage.setItem("refresh", data.refresh);
 
-        msg.innerText = "Login successful";
-        window.location.href = "/dashboard/"; 
+        msg.innerText = "Login successful! Redirecting...";
+        msg.style.color = "#86BC25";
+        window.location.href = "/dashboard/";
       } catch (error) {
         msg.innerText = "Server connection failed";
+        msg.style.color = "#cc0000";
       }
     }
+
+    // Allow Enter key to submit
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") login();
+    });
   </script>
 </body>
 </html>

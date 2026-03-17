@@ -3,57 +3,104 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Employees</title>
-  <link rel="stylesheet" href="../static/app.css" />
+  <title>ZetTrak - Employees</title>
+  <link rel="stylesheet" href="/static/app.css" />
 </head>
 <body>
-  <header class="topbar">
-    <h2>Employees</h2>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </header>
 
-  <nav class="navbar">
-    <a href="/dashboard/">Dashboard</a>
-        <a href="/employees-page/">Employees</a>
-        <a href="/attendance-page/">Attendance</a>
-        <a href="/leaves-page/">Leaves</a>
-        <a href="/leave-history-page/">Leave History</a>
-        <a href="/admin/">Admin</a>
-  </nav>
-
-  <main class="container">
-    <h3>Add Employee</h3>
-
-    <div class="form-grid">
-      <input type="number" id="company" placeholder="Company ID" />
-      <input type="number" id="user" placeholder="User ID" />
-      <input type="text" id="employee_code" placeholder="Employee Code" />
-      <input type="text" id="first_name" placeholder="First Name" />
-      <input type="text" id="last_name" placeholder="Last Name" />
-      <input type="email" id="email" placeholder="Email" />
-      <input type="text" id="phone" placeholder="Phone" />
-      <input type="date" id="date_of_joining" />
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-name">ZetTrak</div>
+      <div class="brand-sub">HRMS System</div>
     </div>
-
-    <button onclick="addEmployee()">Add Employee</button>
-    <button class="secondary-btn" onclick="loadEmployees()">Load Employees</button>
-    <p id="employeeMsg" class="message"></p>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-          </tr>
-        </thead>
-        <tbody id="employeeTableBody"></tbody>
-      </table>
+    <nav class="sidebar-nav">
+      <a href="/dashboard/">
+        <span class="nav-icon">&#127968;</span> Dashboard
+      </a>
+      <a href="/employees-page/" class="active">
+        <span class="nav-icon">&#128101;</span> Employees
+      </a>
+      <a href="/attendance-page/">
+        <span class="nav-icon">&#128203;</span> Attendance
+      </a>
+      <a href="/leaves-page/">
+        <span class="nav-icon">&#127807;</span> Leaves
+      </a>
+      <a href="/leave-history-page/">
+        <span class="nav-icon">&#128202;</span> Leave History
+      </a>
+      <a href="/admin/">
+        <span class="nav-icon">&#9881;</span> Admin
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span>&#128682;</span> Logout
+      </button>
     </div>
-  </main>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>Employees</h2>
+        <p>Add and manage employee records</p>
+      </div>
+      <span class="topbar-badge">ZetTrak</span>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- Add Employee Form -->
+      <div class="form-panel">
+        <div class="section-title">
+          <span>&#128101;</span> Add New Employee
+        </div>
+        <div class="form-grid">
+          <input type="number" id="company" placeholder="Company ID" />
+          <input type="number" id="user" placeholder="User ID" />
+          <input type="text" id="employee_code" placeholder="Employee Code" />
+          <input type="text" id="first_name" placeholder="First Name" />
+          <input type="text" id="last_name" placeholder="Last Name" />
+          <input type="email" id="email" placeholder="Email Address" />
+          <input type="text" id="phone" placeholder="Phone Number" />
+          <input type="date" id="date_of_joining" placeholder="Date of Joining" />
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="addEmployee()">&#43; Add Employee</button>
+          <button class="btn btn-secondary" onclick="loadEmployees()">&#8635; Load Employees</button>
+        </div>
+        <p id="employeeMsg" class="message"></p>
+      </div>
+
+      <!-- Employees Table -->
+      <div class="table-panel">
+        <div class="table-header">
+          <h4>&#128101; Employee List</h4>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+            </tr>
+          </thead>
+          <tbody id="employeeTableBody">
+            <tr class="empty-row"><td colspan="5">Click "Load Employees" to view records</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
 
   <script>
     const API_BASE = window.location.origin + "/api/v1/";
@@ -68,7 +115,13 @@
     function logout() {
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
-      window.location.href = "login.html";
+      window.location.href = "/";
+    }
+
+    function showMsg(id, text, isError = false) {
+      const el = document.getElementById(id);
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
     }
 
     async function addEmployee() {
@@ -84,8 +137,6 @@
         is_active: true
       };
 
-      const msg = document.getElementById("employeeMsg");
-
       try {
         const response = await fetch(API_BASE + "employees/", {
           method: "POST",
@@ -96,20 +147,20 @@
         const data = await response.json();
 
         if (!response.ok) {
-          msg.innerText = "Failed to add employee";
+          showMsg("employeeMsg", "Failed to add employee", true);
           return;
         }
 
-        msg.innerText = "Employee added successfully";
+        showMsg("employeeMsg", "Employee added successfully");
         loadEmployees();
       } catch (error) {
-        msg.innerText = "Server connection failed";
+        showMsg("employeeMsg", "Server connection failed", true);
       }
     }
 
     async function loadEmployees() {
       const tbody = document.getElementById("employeeTableBody");
-      tbody.innerHTML = "";
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='5'>Loading...</td></tr>";
 
       try {
         const response = await fetch(API_BASE + "employees/", {
@@ -119,21 +170,30 @@
 
         const data = await response.json();
 
-        if (!response.ok) return;
+        if (!response.ok) {
+          tbody.innerHTML = "<tr class='empty-row'><td colspan='5'>Failed to load employees</td></tr>";
+          return;
+        }
 
+        if (data.length === 0) {
+          tbody.innerHTML = "<tr class='empty-row'><td colspan='5'>No employees found</td></tr>";
+          return;
+        }
+
+        tbody.innerHTML = "";
         data.forEach(emp => {
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${emp.id ?? ""}</td>
             <td>${emp.employee_code ?? ""}</td>
-            <td>${emp.first_name ?? ""}</td>
+            <td>${emp.first_name ?? ""} ${emp.last_name ?? ""}</td>
             <td>${emp.email ?? ""}</td>
             <td>${emp.phone ?? ""}</td>
           `;
           tbody.appendChild(row);
         });
       } catch (error) {
-        console.log(error);
+        tbody.innerHTML = "<tr class='empty-row'><td colspan='5'>Server connection failed</td></tr>";
       }
     }
   </script>

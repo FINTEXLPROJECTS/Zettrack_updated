@@ -12,6 +12,7 @@ from .views import (
     employees_page,
     attendance_page,
     leaves_page,
+    leave_history_page,
 )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path('employees-page/', employees_page, name='employees_page'),
     path('attendance-page/', attendance_page, name='attendance_page'),
     path('leaves-page/', leaves_page, name='leaves_page'),
+    path('leave-history-page/', leave_history_page, name='leave_history_page'),
 ]
