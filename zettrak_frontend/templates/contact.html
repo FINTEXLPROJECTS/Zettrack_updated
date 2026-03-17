@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - Contact Us</title>
+  <link rel="stylesheet" href="/static/public.css" />
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="pub-navbar">
+    <div class="pub-navbar-inner">
+      <a href="/" class="pub-brand">
+        <span class="pub-brand-icon">&#128188;</span>
+        <div>
+          <span class="pub-brand-name">ZetTrak</span>
+          <span class="pub-brand-tag">HRMS</span>
+        </div>
+      </a>
+      <div class="pub-nav-links">
+        <a href="/">Home</a>
+        <a href="/about/">About</a>
+        <a href="/contact/" class="active">Contact</a>
+        <a href="/login-page/" class="pub-nav-login">&#128274; Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTACT HERO -->
+  <section class="contact-hero">
+    <div class="section-label">&#128222; Contact Us</div>
+    <h1>Get in <span>Touch</span></h1>
+    <p>Have questions about ZetTrak? Want to request a demo or report an issue? We'd love to hear from you.</p>
+  </section>
+
+  <!-- CONTACT CONTENT -->
+  <section class="section section-white">
+    <div class="section-inner">
+      <div class="contact-layout">
+
+        <!-- Info Panel -->
+        <div class="contact-info">
+          <h2>Contact Information</h2>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">&#128205;</div>
+            <div>
+              <h4>Office Address</h4>
+              <p>ZetTrak Headquarters<br>123 Business Park, Tech Street<br>Mumbai, India 400001</p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">&#128231;</div>
+            <div>
+              <h4>Email Address</h4>
+              <p>support@zettrak.com<br>admin@zettrak.com</p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">&#128222;</div>
+            <div>
+              <h4>Phone Number</h4>
+              <p>+91 98765 43210<br>Mon – Fri, 9 AM – 6 PM IST</p>
+            </div>
+          </div>
+
+          <div class="contact-info-item">
+            <div class="contact-info-icon">&#9201;</div>
+            <div>
+              <h4>Business Hours</h4>
+              <p>Monday – Friday: 9:00 AM – 6:00 PM<br>Saturday: 10:00 AM – 2:00 PM</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="contact-form-card">
+          <h2>&#9993; Send Us a Message</h2>
+
+          <div class="form-row-2">
+            <div class="form-field">
+              <label>First Name</label>
+              <input type="text" id="firstName" placeholder="John" />
+            </div>
+            <div class="form-field">
+              <label>Last Name</label>
+              <input type="text" id="lastName" placeholder="Doe" />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Email Address</label>
+            <input type="email" id="contactEmail" placeholder="john@example.com" />
+          </div>
+
+          <div class="form-field">
+            <label>Phone Number</label>
+            <input type="tel" id="contactPhone" placeholder="+91 00000 00000" />
+          </div>
+
+          <div class="form-field">
+            <label>Subject</label>
+            <select id="contactSubject">
+              <option value="">Select a subject...</option>
+              <option value="demo">Request a Demo</option>
+              <option value="support">Technical Support</option>
+              <option value="billing">Billing Inquiry</option>
+              <option value="feature">Feature Request</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label>Message</label>
+            <textarea id="contactMessage" placeholder="Write your message here..."></textarea>
+          </div>
+
+          <button class="btn-submit" onclick="sendMessage()">
+            &#10148; Send Message
+          </button>
+
+          <p id="contactMsg" class="contact-msg"></p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <h2>Already a User?</h2>
+    <p>Log in to your ZetTrak HRMS dashboard to manage employees, attendance, and leaves.</p>
+    <a href="/login-page/" class="btn-cta">&#128274; Login to Dashboard</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="pub-footer">
+    <div class="pub-footer-inner">
+      <div class="pub-footer-top">
+        <div class="pub-footer-brand">
+          <div class="brand-name">ZetTrak</div>
+          <p>A modern Human Resource Management System for efficient and smart workforce management.</p>
+        </div>
+        <div class="pub-footer-links">
+          <h4>Navigation</h4>
+          <a href="/">Home</a>
+          <a href="/about/">About</a>
+          <a href="/contact/">Contact</a>
+          <a href="/login-page/">Login</a>
+        </div>
+        <div class="pub-footer-links">
+          <h4>System</h4>
+          <a href="/dashboard/">Dashboard</a>
+          <a href="/employees-page/">Employees</a>
+          <a href="/attendance-page/">Attendance</a>
+          <a href="/leaves-page/">Leaves</a>
+        </div>
+      </div>
+      <div class="pub-footer-bottom">
+        <p>&copy; 2026 <span>ZetTrak HRMS</span>. All rights reserved.</p>
+        <p>Built with <span>&#10084;</span> using Django &amp; REST Framework</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function sendMessage() {
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("contactEmail").value.trim();
+      const subject = document.getElementById("contactSubject").value;
+      const message = document.getElementById("contactMessage").value.trim();
+      const msg = document.getElementById("contactMsg");
+
+      if (!firstName || !email || !subject || !message) {
+        msg.innerText = "Please fill in all required fields.";
+        msg.className = "contact-msg show";
+        msg.style.color = "#cc0000";
+        msg.style.background = "rgba(204,0,0,0.07)";
+        msg.style.borderLeftColor = "#cc0000";
+        return;
+      }
+
+      // Simulate successful submission
+      msg.innerText = "Thank you, " + firstName + "! Your message has been sent. We will get back to you shortly.";
+      msg.className = "contact-msg show";
+      msg.style.color = "#3a7a00";
+      msg.style.background = "rgba(134,188,37,0.1)";
+      msg.style.borderLeftColor = "#86BC25";
+
+      // Clear form
+      document.getElementById("firstName").value = "";
+      document.getElementById("lastName").value = "";
+      document.getElementById("contactEmail").value = "";
+      document.getElementById("contactPhone").value = "";
+      document.getElementById("contactSubject").value = "";
+      document.getElementById("contactMessage").value = "";
+    }
+  </script>
+
+</body>
+</html>

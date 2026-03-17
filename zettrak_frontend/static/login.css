@@ -92,3 +92,16 @@ body {
   font-size: 14px;
   min-height: 20px;
 }
+
+.back-home {
+  display: inline-block;
+  margin-top: 18px;
+  font-size: 13px;
+  color: #888888;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.back-home:hover {
+  color: #86BC25;
+}
