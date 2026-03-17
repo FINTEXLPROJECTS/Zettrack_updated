@@ -11,6 +11,12 @@ from .views import (
     attendance_page,
     leaves_page,
     leave_history_page,
+    customer_dashboard_page,
+    users_page,
+    roles_page,
+    companies_page,
+    leave_types_page,
+    leave_balances_page,
 )
 
 urlpatterns = [
@@ -32,4 +38,12 @@ urlpatterns = [
     path('attendance-page/', attendance_page, name='attendance_page'),
     path('leaves-page/', leaves_page, name='leaves_page'),
     path('leave-history-page/', leave_history_page, name='leave_history_page'),
+    path('customer-dashboard/', customer_dashboard_page, name='customer_dashboard_page'),
+
+    # New management pages
+    path('users-page/', users_page, name='users_page'),
+    path('roles-page/', roles_page, name='roles_page'),
+    path('companies-page/', companies_page, name='companies_page'),
+    path('leave-types-page/', leave_types_page, name='leave_types_page'),
+    path('leave-balances-page/', leave_balances_page, name='leave_balances_page'),
 ]

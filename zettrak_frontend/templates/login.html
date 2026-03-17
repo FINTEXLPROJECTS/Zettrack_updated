@@ -1,34 +1,102 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZetTrak - Login</title>
-  <link rel="stylesheet" href="/static/login.css" />
+  <link rel="stylesheet" href="{% static 'login.css' %}" />
 </head>
 <body>
-  <div class="login-container">
-    <div class="login-card">
+  <div class="login-page">
+
+    <!-- PAGE HEADER -->
+    <div class="login-header">
       <div class="login-logo">&#128188;</div>
       <h1>ZetTrak</h1>
-      <p class="subtitle">HRMS Admin Login</p>
+      <p class="login-tagline">Human Resource Management System</p>
+    </div>
 
-      <input type="text" id="username" placeholder="Enter username" />
-      <input type="password" id="password" placeholder="Enter password" />
+    <!-- SUBTITLE -->
+    <p class="choose-label">Choose your login type to continue</p>
 
-      <button onclick="login()">Login</button>
-      <p id="loginMsg" class="message"></p>
+    <!-- TWO CARDS -->
+    <div class="login-cards-row">
+
+      <!-- ADMIN CARD -->
+      <div class="login-card admin-card">
+        <div class="card-top">
+          <div class="card-icon-wrap admin-icon-wrap">&#9881;</div>
+          <h2>Admin Login</h2>
+          <p class="card-desc">Access the full admin dashboard, manage employees, attendance, payroll and reports.</p>
+        </div>
+        <div class="card-form">
+          <div class="input-group">
+            <label>Username</label>
+            <input type="text" id="admin-username" placeholder="Enter admin username" />
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="admin-password" placeholder="Enter password" />
+          </div>
+          <button class="login-btn admin-btn" onclick="adminLogin()">
+            &#128274; &nbsp;Login as Admin
+          </button>
+          <p id="adminMsg" class="login-msg"></p>
+        </div>
+      </div>
+
+      <!-- DIVIDER -->
+      <div class="cards-divider">
+        <div class="divider-line"></div>
+        <span class="divider-text">OR</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- CUSTOMER CARD -->
+      <div class="login-card customer-card">
+        <div class="card-top">
+          <div class="card-icon-wrap customer-icon-wrap">&#128100;</div>
+          <h2>Customer Login</h2>
+          <p class="card-desc">Access your personal employee portal, check attendance, and manage leave requests.</p>
+        </div>
+        <div class="card-form">
+          <div class="input-group">
+            <label>Username</label>
+            <input type="text" id="customer-username" placeholder="Enter your username" />
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="customer-password" placeholder="Enter password" />
+          </div>
+          <button class="login-btn customer-btn" onclick="customerLogin()">
+            &#128100; &nbsp;Login as Customer
+          </button>
+          <p id="customerMsg" class="login-msg"></p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="login-footer">
       <a href="/" class="back-home">&#8592; Back to Home</a>
     </div>
+
   </div>
 
   <script>
     const API_BASE = window.location.origin + "/api/v1/";
 
-    async function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      const msg = document.getElementById("loginMsg");
+    async function adminLogin() {
+      const username = document.getElementById("admin-username").value.trim();
+      const password = document.getElementById("admin-password").value;
+      const msg = document.getElementById("adminMsg");
+
+      if (!username || !password) {
+        showMsg(msg, "Please enter username and password.", false);
+        return;
+      }
 
       try {
         const response = await fetch(API_BASE + "auth/login/", {
@@ -40,25 +108,78 @@
         const data = await response.json();
 
         if (!response.ok) {
-          msg.innerText = data.error || "Login failed";
-          msg.style.color = "#cc0000";
+          showMsg(msg, data.error || "Login failed. Check credentials.", false);
+          return;
+        }
+
+        if (!data.user.is_staff) {
+          showMsg(msg, "Access denied. This account does not have admin privileges.", false);
           return;
         }
 
         localStorage.setItem("access", data.access);
         localStorage.setItem("refresh", data.refresh);
+        localStorage.setItem("username", data.user.username);
+        localStorage.setItem("userType", "admin");
 
-        msg.innerText = "Login successful! Redirecting...";
-        msg.style.color = "#86BC25";
-        window.location.href = "/dashboard/";
-      } catch (error) {
-        msg.innerText = "Server connection failed";
-        msg.style.color = "#cc0000";
+        showMsg(msg, "Login successful! Redirecting to Admin Dashboard...", true);
+        setTimeout(() => { window.location.href = "/dashboard/"; }, 800);
+
+      } catch (e) {
+        showMsg(msg, "Server connection failed. Try again.", false);
       }
     }
 
+    async function customerLogin() {
+      const username = document.getElementById("customer-username").value.trim();
+      const password = document.getElementById("customer-password").value;
+      const msg = document.getElementById("customerMsg");
+
+      if (!username || !password) {
+        showMsg(msg, "Please enter username and password.", false);
+        return;
+      }
+
+      try {
+        const response = await fetch(API_BASE + "auth/login/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          showMsg(msg, data.error || "Login failed. Check credentials.", false);
+          return;
+        }
+
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
+        localStorage.setItem("username", data.user.username);
+        localStorage.setItem("userType", "customer");
+
+        showMsg(msg, "Login successful! Redirecting to Your Portal...", true);
+        setTimeout(() => { window.location.href = "/customer-dashboard/"; }, 800);
+
+      } catch (e) {
+        showMsg(msg, "Server connection failed. Try again.", false);
+      }
+    }
+
+    function showMsg(el, text, isSuccess) {
+      el.textContent = text;
+      el.style.color = isSuccess ? "#2e7d32" : "#c62828";
+      el.style.background = isSuccess ? "rgba(46,125,50,0.08)" : "rgba(198,40,40,0.08)";
+      el.style.borderLeftColor = isSuccess ? "#2e7d32" : "#c62828";
+    }
+
     document.addEventListener("keydown", function(e) {
-      if (e.key === "Enter") login();
+      if (e.key === "Enter") {
+        const focused = document.activeElement;
+        if (focused && focused.closest(".admin-card")) adminLogin();
+        else if (focused && focused.closest(".customer-card")) customerLogin();
+      }
     });
   </script>
 </body>

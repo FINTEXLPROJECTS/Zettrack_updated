@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - Roles</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .del-btn { padding:4px 10px; background:#e53935; color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; }
+    .del-btn:hover { opacity:0.85; }
+    .role-chip { display:inline-block; padding:4px 14px; border-radius:20px; background:rgba(134,188,37,0.12); color:#3a7a00; font-size:13px; font-weight:600; }
+  </style>
+</head>
+<body>
+
+  {% with active_page='roles' %}{% include '_sidebar.html' %}{% endwith %}
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#127959; Roles</h2>
+        <p>Manage user roles and access levels</p>
+      </div>
+      <span class="topbar-badge">&#9881; Admin</span>
+    </header>
+
+    <main class="content">
+
+      <!-- Add Role Form -->
+      <div class="form-panel">
+        <div class="section-title"><span>&#43;</span> Add New Role</div>
+        <div class="form-grid">
+          <input type="text" id="r_name" placeholder="Role name (e.g. HR Manager, Supervisor)" />
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="addRole()">&#43; Add Role</button>
+          <button class="btn btn-secondary" onclick="loadRoles()">&#8635; Refresh</button>
+        </div>
+        <p id="roleMsg" class="message"></p>
+      </div>
+
+      <!-- Roles Table -->
+      <div class="table-panel">
+        <div class="table-header"><h4>&#127959; All Roles</h4></div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Role Name</th><th>Action</th></tr>
+          </thead>
+          <tbody id="roleTableBody">
+            <tr class="empty-row"><td colspan="3">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() { localStorage.clear(); window.location.href = "/login-page/"; }
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("roleMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
+    }
+
+    async function addRole() {
+      const name = document.getElementById("r_name").value.trim();
+      if (!name) { showMsg("Role name is required", true); return; }
+      try {
+        const res = await fetch(API_BASE + "accounts/roles/", { method: "POST", headers: authHeaders(), body: JSON.stringify({ name }) });
+        const data = await res.json();
+        if (!res.ok) { showMsg("Failed: " + JSON.stringify(data), true); return; }
+        showMsg("Role '" + name + "' created successfully");
+        document.getElementById("r_name").value = "";
+        loadRoles();
+      } catch { showMsg("Server connection failed", true); }
+    }
+
+    async function deleteRole(id, name) {
+      if (!confirm("Delete role '" + name + "'? This cannot be undone.")) return;
+      try {
+        const res = await fetch(`${API_BASE}accounts/roles/${id}/`, { method: "DELETE", headers: authHeaders() });
+        if (res.status === 204 || res.ok) { showMsg("Role deleted"); loadRoles(); }
+        else showMsg("Failed to delete", true);
+      } catch { showMsg("Server error", true); }
+    }
+
+    async function loadRoles() {
+      const tbody = document.getElementById("roleTableBody");
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='3'>Loading...</td></tr>";
+      try {
+        const res = await fetch(API_BASE + "accounts/roles/", { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { tbody.innerHTML = "<tr class='empty-row'><td colspan='3'>Failed to load</td></tr>"; return; }
+        if (data.length === 0) { tbody.innerHTML = "<tr class='empty-row'><td colspan='3'>No roles found. Add one above.</td></tr>"; return; }
+        tbody.innerHTML = "";
+        data.forEach(r => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${r.id??""}</td><td><span class="role-chip">${r.name??""}</span></td><td><button class="del-btn" onclick="deleteRole(${r.id},'${(r.name||"").replace(/'/g,"\\'")}')">&#128465; Delete</button></td>`;
+          tbody.appendChild(tr);
+        });
+      } catch { tbody.innerHTML = "<tr class='empty-row'><td colspan='3'>Server connection failed</td></tr>"; }
+    }
+
+    loadRoles();
+  </script>
+</body>
+</html>

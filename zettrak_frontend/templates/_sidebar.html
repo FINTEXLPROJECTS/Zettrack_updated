@@ -1,0 +1,60 @@
+<!-- REUSABLE ADMIN SIDEBAR PARTIAL -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">ZetTrak</div>
+    <div class="brand-sub">HRMS Admin Panel</div>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <span class="nav-section-label">Overview</span>
+    <a href="/dashboard/" {% if active_page == 'dashboard' %}class="active"{% endif %}>
+      <span class="nav-icon">&#127968;</span> Dashboard
+    </a>
+
+    <span class="nav-section-label">Organization</span>
+    <a href="/companies-page/" {% if active_page == 'companies' %}class="active"{% endif %}>
+      <span class="nav-icon">&#127963;</span> Companies
+    </a>
+    <a href="/roles-page/" {% if active_page == 'roles' %}class="active"{% endif %}>
+      <span class="nav-icon">&#127959;</span> Roles
+    </a>
+    <a href="/users-page/" {% if active_page == 'users' %}class="active"{% endif %}>
+      <span class="nav-icon">&#128100;</span> Users
+    </a>
+
+    <span class="nav-section-label">HR Management</span>
+    <a href="/employees-page/" {% if active_page == 'employees' %}class="active"{% endif %}>
+      <span class="nav-icon">&#128101;</span> Employees
+    </a>
+    <a href="/attendance-page/" {% if active_page == 'attendance' %}class="active"{% endif %}>
+      <span class="nav-icon">&#128203;</span> Attendance
+    </a>
+
+    <span class="nav-section-label">Leave Management</span>
+    <a href="/leaves-page/" {% if active_page == 'leaves' %}class="active"{% endif %}>
+      <span class="nav-icon">&#127807;</span> Apply Leave
+    </a>
+    <a href="/leave-history-page/" {% if active_page == 'leave_history' %}class="active"{% endif %}>
+      <span class="nav-icon">&#128202;</span> Leave Requests
+    </a>
+    <a href="/leave-types-page/" {% if active_page == 'leave_types' %}class="active"{% endif %}>
+      <span class="nav-icon">&#128196;</span> Leave Types
+    </a>
+    <a href="/leave-balances-page/" {% if active_page == 'leave_balances' %}class="active"{% endif %}>
+      <span class="nav-icon">&#9878;</span> Leave Balances
+    </a>
+
+    <span class="nav-section-label">System</span>
+    <a href="/admin/" target="_blank">
+      <span class="nav-icon">&#9881;</span> Django Admin
+    </a>
+
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="logout()">
+      <span>&#128682;</span> Logout
+    </button>
+  </div>
+</aside>

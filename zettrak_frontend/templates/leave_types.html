@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - Leave Types</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .del-btn { padding:4px 10px; background:#e53935; color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; }
+    .del-btn:hover { opacity:0.85; }
+    .days-badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:700; background:#f0f6e4; color:#3a7a00; }
+  </style>
+</head>
+<body>
+
+  {% with active_page='leave_types' %}{% include '_sidebar.html' %}{% endwith %}
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#128196; Leave Types</h2>
+        <p>Configure leave type categories and default days</p>
+      </div>
+      <span class="topbar-badge">&#9881; Admin</span>
+    </header>
+
+    <main class="content">
+
+      <!-- Add Leave Type Form -->
+      <div class="form-panel">
+        <div class="section-title"><span>&#43;</span> Add New Leave Type</div>
+        <div class="form-grid">
+          <input type="text"   id="lt_name"         placeholder="Leave Type Name (e.g. Sick Leave, Annual Leave)" />
+          <input type="number" id="lt_default_days"  placeholder="Default Days Allowed" min="0" />
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="addLeaveType()">&#43; Add Leave Type</button>
+          <button class="btn btn-secondary" onclick="loadLeaveTypes()">&#8635; Refresh</button>
+        </div>
+        <p id="leaveTypeMsg" class="message"></p>
+      </div>
+
+      <!-- Leave Types Table -->
+      <div class="table-panel">
+        <div class="table-header"><h4>&#128196; All Leave Types</h4></div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Leave Type Name</th><th>Default Days</th><th>Action</th></tr>
+          </thead>
+          <tbody id="leaveTypeTableBody">
+            <tr class="empty-row"><td colspan="4">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() { localStorage.clear(); window.location.href = "/login-page/"; }
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("leaveTypeMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
+    }
+
+    async function addLeaveType() {
+      const name = document.getElementById("lt_name").value.trim();
+      const default_days = parseInt(document.getElementById("lt_default_days").value) || 0;
+      if (!name) { showMsg("Leave type name is required", true); return; }
+      try {
+        const res = await fetch(API_BASE + "leaves/types/", { method: "POST", headers: authHeaders(), body: JSON.stringify({ name, default_days }) });
+        const data = await res.json();
+        if (!res.ok) { showMsg("Failed: " + JSON.stringify(data), true); return; }
+        showMsg("Leave type '" + name + "' created successfully");
+        document.getElementById("lt_name").value = "";
+        document.getElementById("lt_default_days").value = "";
+        loadLeaveTypes();
+      } catch { showMsg("Server connection failed", true); }
+    }
+
+    async function deleteLeaveType(id, name) {
+      if (!confirm("Delete leave type '" + name + "'? This cannot be undone.")) return;
+      try {
+        const res = await fetch(`${API_BASE}leaves/types/${id}/`, { method: "DELETE", headers: authHeaders() });
+        if (res.status === 204 || res.ok) { showMsg("Leave type deleted"); loadLeaveTypes(); }
+        else showMsg("Failed to delete", true);
+      } catch { showMsg("Server error", true); }
+    }
+
+    async function loadLeaveTypes() {
+      const tbody = document.getElementById("leaveTypeTableBody");
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='4'>Loading...</td></tr>";
+      try {
+        const res = await fetch(API_BASE + "leaves/types/", { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { tbody.innerHTML = "<tr class='empty-row'><td colspan='4'>Failed to load</td></tr>"; return; }
+        if (data.length === 0) { tbody.innerHTML = "<tr class='empty-row'><td colspan='4'>No leave types found. Add one above.</td></tr>"; return; }
+        tbody.innerHTML = "";
+        data.forEach(lt => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${lt.id??""}</td><td><strong>${lt.name??""}</strong></td><td><span class="days-badge">${lt.default_days??0} days</span></td><td><button class="del-btn" onclick="deleteLeaveType(${lt.id},'${(lt.name||"").replace(/'/g,"\\'")}')">&#128465; Delete</button></td>`;
+          tbody.appendChild(tr);
+        });
+      } catch { tbody.innerHTML = "<tr class='empty-row'><td colspan='4'>Server connection failed</td></tr>"; }
+    }
+
+    loadLeaveTypes();
+  </script>
+</body>
+</html>

@@ -1,76 +1,50 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZetTrak - Apply Leave</title>
-  <link rel="stylesheet" href="/static/app.css" />
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-name">ZetTrak</div>
-      <div class="brand-sub">HRMS System</div>
-    </div>
-    <nav class="sidebar-nav">
-      <a href="/dashboard/">
-        <span class="nav-icon">&#127968;</span> Dashboard
-      </a>
-      <a href="/employees-page/">
-        <span class="nav-icon">&#128101;</span> Employees
-      </a>
-      <a href="/attendance-page/">
-        <span class="nav-icon">&#128203;</span> Attendance
-      </a>
-      <a href="/leaves-page/" class="active">
-        <span class="nav-icon">&#127807;</span> Leaves
-      </a>
-      <a href="/leave-history-page/">
-        <span class="nav-icon">&#128202;</span> Leave History
-      </a>
-      <a href="/admin/">
-        <span class="nav-icon">&#9881;</span> Admin
-      </a>
-    </nav>
-    <div class="sidebar-footer">
-      <button class="logout-btn" onclick="logout()">
-        <span>&#128682;</span> Logout
-      </button>
-    </div>
-  </aside>
+  {% with active_page='leaves' %}{% include '_sidebar.html' %}{% endwith %}
 
-  <!-- MAIN WRAPPER -->
   <div class="main-wrapper">
-
-    <!-- TOPBAR -->
     <header class="topbar">
       <div class="topbar-left">
-        <h2>Apply Leave</h2>
+        <h2>&#127807; Apply Leave</h2>
         <p>Submit a new leave request</p>
       </div>
-      <span class="topbar-badge">ZetTrak</span>
+      <span class="topbar-badge">&#9881; Admin</span>
     </header>
 
-    <!-- CONTENT -->
     <main class="content">
 
       <div class="form-panel">
-        <div class="section-title">
-          <span>&#127807;</span> Leave Application Form
-        </div>
+        <div class="section-title"><span>&#127807;</span> Leave Application Form</div>
         <div class="form-grid">
           <input type="number" id="leaveEmployee" placeholder="Employee ID" />
           <input type="number" id="leaveType" placeholder="Leave Type ID" />
-          <input type="date" id="startDate" placeholder="Start Date" />
-          <input type="date" id="endDate" placeholder="End Date" />
+          <input type="date" id="startDate" />
+          <input type="date" id="endDate" />
           <textarea id="reason" placeholder="Reason for leave..."></textarea>
         </div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="applyLeave()">&#10003; Submit Leave</button>
+          <button class="btn btn-primary" onclick="applyLeave()">&#10003; Submit Leave Request</button>
         </div>
         <p id="leaveMsg" class="message"></p>
+      </div>
+
+      <div class="form-panel" style="background:#f8fffe; border-top-color:#1e3a5f; margin-top:0;">
+        <p style="font-size:13px; color:#555; line-height:1.6;">
+          &#128161; <strong>Tip:</strong> Get Employee IDs from the
+          <a href="/employees-page/" style="color:#86BC25;">Employees</a> page and Leave Type IDs from the
+          <a href="/leave-types-page/" style="color:#86BC25;">Leave Types</a> page.
+          After submitting, approve or reject requests from the
+          <a href="/leave-history-page/" style="color:#86BC25;">Leave Requests</a> page.
+        </p>
       </div>
 
     </main>
@@ -78,20 +52,13 @@
 
   <script>
     const API_BASE = window.location.origin + "/api/v1/";
-
     function authHeaders() {
-      return {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + localStorage.getItem("access")
-      };
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
     }
-
     function logout() {
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
+      localStorage.clear();
       window.location.href = "/login-page/";
     }
-
     function showMsg(text, isError = false) {
       const el = document.getElementById("leaveMsg");
       el.innerText = text;
@@ -106,25 +73,15 @@
         end_date: document.getElementById("endDate").value,
         reason: document.getElementById("reason").value
       };
-
-      try {
-        const response = await fetch(API_BASE + "leaves/apply/", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          showMsg("Leave application failed", true);
-          return;
-        }
-
-        showMsg("Leave applied successfully");
-      } catch (error) {
-        showMsg("Server connection failed", true);
+      if (!payload.employee || !payload.leave_type || !payload.start_date || !payload.end_date) {
+        showMsg("Please fill all required fields", true); return;
       }
+      try {
+        const res = await fetch(API_BASE + "leaves/apply/", { method: "POST", headers: authHeaders(), body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) { showMsg("Failed: " + JSON.stringify(data), true); return; }
+        showMsg("Leave applied successfully! Go to Leave Requests to approve/reject.");
+      } catch { showMsg("Server connection failed", true); }
     }
   </script>
 </body>
