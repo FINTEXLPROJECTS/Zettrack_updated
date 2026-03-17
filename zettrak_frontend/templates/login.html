@@ -18,6 +18,7 @@
 
       <button onclick="login()">Login</button>
       <p id="loginMsg" class="message"></p>
+      <a href="/" class="back-home">&#8592; Back to Home</a>
     </div>
   </div>
 
@@ -56,7 +57,6 @@
       }
     }
 
-    // Allow Enter key to submit
     document.addEventListener("keydown", function(e) {
       if (e.key === "Enter") login();
     });
