@@ -109,6 +109,71 @@ class LoginView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+# ── Customer Login (email + phone) ──
+
+class CustomerLoginView(APIView):
+    permission_classes = []
+
+    def post(self, request):
+        from employees.models import Employee  # lazy import to avoid circular dependency
+
+        email = request.data.get('email', '').strip()
+        phone = request.data.get('phone', '').strip()
+
+        if not email or not phone:
+            return Response(
+                {'error': 'Email and mobile number are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            employee = Employee.objects.select_related('user', 'company').get(
+                email=email, phone=phone, is_active=True
+            )
+        except Employee.DoesNotExist:
+            return Response(
+                {'error': 'No active employee found with these credentials. Please contact your admin.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        except Employee.MultipleObjectsReturned:
+            return Response(
+                {'error': 'Multiple records found. Please contact your admin.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user = employee.user
+        if not user.is_active:
+            return Response(
+                {'error': 'Your account is inactive. Please contact admin.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'message': 'Login successful',
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'is_staff': user.is_staff,
+            },
+            'employee': {
+                'id': employee.id,
+                'employee_code': employee.employee_code,
+                'first_name': employee.first_name,
+                'last_name': employee.last_name or '',
+                'full_name': f"{employee.first_name} {employee.last_name or ''}".strip(),
+                'email': employee.email,
+                'phone': employee.phone,
+                'date_of_joining': str(employee.date_of_joining),
+                'company_name': employee.company.name if employee.company else '',
+            }
+        }, status=status.HTTP_200_OK)
+
+
 # ── Users API ──
 
 class UserListCreateView(generics.ListCreateAPIView):

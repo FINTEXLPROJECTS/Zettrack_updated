@@ -2,6 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     LoginView,
+    CustomerLoginView,
     home_page,
     about_page,
     contact_page,
@@ -22,6 +23,7 @@ from .views import (
 urlpatterns = [
     # API endpoints
     path('login/', LoginView.as_view(), name='login_api'),
+    path('customer-login/', CustomerLoginView.as_view(), name='customer_login_api'),
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Public pages (no login required)

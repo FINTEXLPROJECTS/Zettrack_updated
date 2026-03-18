@@ -7,63 +7,114 @@
   <title>ZetTrak - My Portal</title>
   <link rel="stylesheet" href="{% static 'app.css' %}" />
   <style>
+    /* ── CUSTOMER THEME ── */
     .customer-badge { background: #1e3a5f; }
-    .cust-welcome { background: #f0f7ff; border-left-color: #1e3a5f; }
+    .cust-welcome   { background: #f0f7ff; border-left-color: #1e3a5f; }
     .cust-welcome h3 { color: #1e3a5f; }
+
+    /* ── PROFILE CARD ── */
+    .profile-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 32px 36px;
+      box-shadow: 0 4px 20px rgba(30,58,95,0.1);
+      border-top: 5px solid #1e3a5f;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 24px;
+    }
+    .profile-avatar-wrap {
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1e3a5f, #2d6fa8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(30,58,95,0.3);
+    }
+    .profile-details { flex: 1; }
+    .profile-details h3 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1e3a5f;
+      margin-bottom: 4px;
+    }
+    .profile-code {
+      display: inline-block;
+      background: rgba(30,58,95,0.1);
+      color: #1e3a5f;
+      padding: 3px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      letter-spacing: 0.5px;
+    }
+    .profile-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      color: #555;
+    }
+    .meta-icon {
+      font-size: 15px;
+    }
+    .meta-label {
+      font-size: 11px;
+      color: #999;
+      display: block;
+      margin-bottom: 1px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+    .meta-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+    }
+    .profile-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 12px;
+    }
+
+    /* ── SECTION HEADING ── */
+    .section-heading {
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+      margin: 28px 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e8e8e8;
+    }
+
+    /* ── ACTION CARDS ── */
     .action-card { cursor: pointer; }
     .action-card:nth-child(1) { border-top-color: #1e3a5f; }
     .action-card:nth-child(2) { border-top-color: #86BC25; }
     .action-card:nth-child(3) { border-top-color: #f57c00; }
-    .profile-panel {
-      background: #f8fffe;
-      border-radius: 14px;
-      padding: 28px 32px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      border-top: 3px solid #1e3a5f;
-      margin-top: 28px;
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
-    .profile-avatar {
-      width: 72px;
-      height: 72px;
-      background: linear-gradient(135deg, #1e3a5f, #2d5f9a);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      flex-shrink: 0;
-    }
-    .profile-info h4 {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1e3a5f;
-      margin-bottom: 4px;
-    }
-    .profile-info p {
-      font-size: 13px;
-      color: #666;
-    }
-    .profile-badge {
-      display: inline-block;
-      margin-top: 8px;
-      background: rgba(30,58,95,0.1);
-      color: #1e3a5f;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-    }
-    .section-heading {
-      font-size: 16px;
-      font-weight: 700;
-      color: #333;
-      margin-bottom: 16px;
-      margin-top: 30px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #e0e0e0;
+
+    @media (max-width: 640px) {
+      .profile-card { flex-direction: column; text-align: center; }
+      .profile-meta { justify-content: center; }
     }
   </style>
 </head>
@@ -80,7 +131,7 @@
         <span class="nav-icon">&#127968;</span> My Dashboard
       </a>
       <a href="/attendance-page/">
-        <span class="nav-icon">&#128203;</span> Attendance
+        <span class="nav-icon">&#128203;</span> My Attendance
       </a>
       <a href="/leaves-page/">
         <span class="nav-icon">&#127807;</span> Apply Leave
@@ -102,27 +153,52 @@
     <!-- TOPBAR -->
     <header class="topbar">
       <div class="topbar-left">
-        <h2>My Portal</h2>
-        <p>Employee self-service dashboard</p>
+        <h2>&#127968; My Portal</h2>
+        <p id="topbarSub">Employee self-service dashboard</p>
       </div>
-      <span class="topbar-badge customer-badge">&#128100; Employee</span>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:13px; color:#888;" id="topbarName"></span>
+        <span class="topbar-badge customer-badge">&#128100; Employee</span>
+      </div>
     </header>
 
     <!-- CONTENT -->
     <main class="content">
 
-      <!-- PROFILE PANEL -->
-      <div class="profile-panel">
-        <div class="profile-avatar">&#128100;</div>
-        <div class="profile-info">
-          <h4 id="profileName">Loading...</h4>
-          <p>Employee Account &nbsp;|&nbsp; ZetTrak HRMS</p>
-          <span class="profile-badge">&#10003; Active Employee</span>
+      <!-- PROFILE CARD -->
+      <div class="profile-card">
+        <div class="profile-avatar-wrap">&#128100;</div>
+        <div class="profile-details">
+          <h3 id="profileFullName">—</h3>
+          <span class="profile-code" id="profileCode">Loading...</span>
+
+          <div class="profile-meta">
+            <div>
+              <span class="meta-label">&#128231; Email</span>
+              <span class="meta-value" id="profileEmail">—</span>
+            </div>
+            <div>
+              <span class="meta-label">&#128241; Mobile</span>
+              <span class="meta-value" id="profilePhone">—</span>
+            </div>
+            <div>
+              <span class="meta-label">&#127963; Company</span>
+              <span class="meta-value" id="profileCompany">—</span>
+            </div>
+            <div>
+              <span class="meta-label">&#128197; Joined</span>
+              <span class="meta-value" id="profileJoined">—</span>
+            </div>
+          </div>
+
+          <div class="profile-status">
+            <span>&#9679;</span> Active Employee
+          </div>
         </div>
       </div>
 
       <!-- WELCOME BANNER -->
-      <div class="welcome-banner cust-welcome" style="margin-top: 20px;">
+      <div class="welcome-banner cust-welcome">
         <div>
           <h3 id="welcomeName">Welcome!</h3>
           <p>Manage your attendance, leave requests, and personal records all from your portal.</p>
@@ -136,7 +212,7 @@
         <div class="card action-card" onclick="window.location.href='/attendance-page/'">
           <span class="card-icon">&#128203;</span>
           <h4>Check In / Out</h4>
-          <p>Record your daily attendance — mark your arrival and departure.</p>
+          <p>Record your daily attendance — mark your arrival and departure time.</p>
         </div>
         <div class="card action-card" onclick="window.location.href='/leaves-page/'">
           <span class="card-icon">&#127807;</span>
@@ -150,20 +226,20 @@
         </div>
       </div>
 
-      <!-- INFO SECTION -->
-      <div class="section-heading">&#128276; Your Portal Features</div>
+      <!-- PORTAL INFO -->
+      <div class="section-heading">&#128276; Portal Features</div>
       <div class="cards">
-        <div class="card" style="border-top-color: #86BC25; background: #f9fff5;">
+        <div class="card" style="border-top-color:#86BC25; background:#f9fff5;">
           <span class="card-icon">&#9200;</span>
           <h4>Attendance Tracking</h4>
           <p>View your complete attendance records with check-in and check-out times.</p>
         </div>
-        <div class="card" style="border-top-color: #f57c00; background: #fffdf5;">
+        <div class="card" style="border-top-color:#f57c00; background:#fffdf5;">
           <span class="card-icon">&#128197;</span>
           <h4>Leave Management</h4>
           <p>Apply for leaves and track approvals or rejections in real-time.</p>
         </div>
-        <div class="card" style="border-top-color: #7b1fa2; background: #fdf5ff;">
+        <div class="card" style="border-top-color:#7b1fa2; background:#fdf5ff;">
           <span class="card-icon">&#128196;</span>
           <h4>Leave Balance</h4>
           <p>Check your remaining leave balance for different leave categories.</p>
@@ -174,23 +250,41 @@
   </div>
 
   <script>
+    // ── Guard: must be logged in ──
+    if (!localStorage.getItem("access")) {
+      window.location.href = "/login-page/";
+    }
+
+    // ── Load employee profile from localStorage ──
+    const raw = localStorage.getItem("employeeData");
+    const emp = raw ? JSON.parse(raw) : null;
+
+    if (emp) {
+      const fullName = emp.full_name || (emp.first_name + " " + (emp.last_name || "")).trim();
+
+      document.getElementById("profileFullName").textContent = fullName;
+      document.getElementById("profileCode").textContent     = "EMP CODE: " + (emp.employee_code || "—");
+      document.getElementById("profileEmail").textContent    = emp.email   || "—";
+      document.getElementById("profilePhone").textContent    = emp.phone   || "—";
+      document.getElementById("profileCompany").textContent  = emp.company_name || "—";
+      document.getElementById("profileJoined").textContent   = emp.date_of_joining || "—";
+      document.getElementById("welcomeName").textContent     = "Welcome back, " + (emp.first_name || fullName) + "!";
+      document.getElementById("topbarName").textContent      = fullName;
+      document.getElementById("topbarSub").textContent       = "Employee Portal — " + (emp.company_name || "ZetTrak HRMS");
+    } else {
+      // fallback to username
+      const uname = localStorage.getItem("username") || "Employee";
+      document.getElementById("profileFullName").textContent = uname;
+      document.getElementById("welcomeName").textContent = "Welcome back, " + uname + "!";
+      document.getElementById("topbarName").textContent = uname;
+    }
+
     function logout() {
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
       localStorage.removeItem("username");
       localStorage.removeItem("userType");
-      window.location.href = "/login-page/";
-    }
-
-    const username = localStorage.getItem("username");
-    if (username) {
-      document.getElementById("welcomeName").textContent = "Welcome back, " + username + "!";
-      document.getElementById("profileName").textContent = username;
-    }
-
-    // Redirect admin users away from customer portal
-    const userType = localStorage.getItem("userType");
-    if (!localStorage.getItem("access")) {
+      localStorage.removeItem("employeeData");
       window.location.href = "/login-page/";
     }
   </script>

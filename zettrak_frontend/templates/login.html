@@ -57,20 +57,20 @@
       <div class="login-card customer-card">
         <div class="card-top">
           <div class="card-icon-wrap customer-icon-wrap">&#128100;</div>
-          <h2>Customer Login</h2>
-          <p class="card-desc">Access your personal employee portal, check attendance, and manage leave requests.</p>
+          <h2>Employee Login</h2>
+          <p class="card-desc">Login with your registered email and mobile number to access your personal employee portal.</p>
         </div>
         <div class="card-form">
           <div class="input-group">
-            <label>Username</label>
-            <input type="text" id="customer-username" placeholder="Enter your username" />
+            <label>Registered Email</label>
+            <input type="email" id="customer-email" placeholder="Enter your email address" />
           </div>
           <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="customer-password" placeholder="Enter password" />
+            <label>Mobile Number</label>
+            <input type="tel" id="customer-phone" placeholder="Enter your mobile number" />
           </div>
           <button class="login-btn customer-btn" onclick="customerLogin()">
-            &#128100; &nbsp;Login as Customer
+            &#128100; &nbsp;Login as Employee
           </button>
           <p id="customerMsg" class="login-msg"></p>
         </div>
@@ -131,35 +131,39 @@
     }
 
     async function customerLogin() {
-      const username = document.getElementById("customer-username").value.trim();
-      const password = document.getElementById("customer-password").value;
+      const email = document.getElementById("customer-email").value.trim();
+      const phone = document.getElementById("customer-phone").value.trim();
       const msg = document.getElementById("customerMsg");
 
-      if (!username || !password) {
-        showMsg(msg, "Please enter username and password.", false);
+      if (!email || !phone) {
+        showMsg(msg, "Please enter your email and mobile number.", false);
         return;
       }
 
       try {
-        const response = await fetch(API_BASE + "auth/login/", {
+        const response = await fetch(API_BASE + "auth/customer-login/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password })
+          body: JSON.stringify({ email, phone })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          showMsg(msg, data.error || "Login failed. Check credentials.", false);
+          showMsg(msg, data.error || "Login failed. Check your credentials.", false);
           return;
         }
 
+        // Store tokens
         localStorage.setItem("access", data.access);
         localStorage.setItem("refresh", data.refresh);
-        localStorage.setItem("username", data.user.username);
         localStorage.setItem("userType", "customer");
 
-        showMsg(msg, "Login successful! Redirecting to Your Portal...", true);
+        // Store full employee profile
+        localStorage.setItem("employeeData", JSON.stringify(data.employee));
+        localStorage.setItem("username", data.employee.full_name || data.user.username);
+
+        showMsg(msg, "Login successful! Redirecting to your portal...", true);
         setTimeout(() => { window.location.href = "/customer-dashboard/"; }, 800);
 
       } catch (e) {
@@ -181,6 +185,10 @@
         else if (focused && focused.closest(".customer-card")) customerLogin();
       }
     });
+
+    // Clear fields on load
+    document.getElementById("customer-email").value = "";
+    document.getElementById("customer-phone").value = "";
   </script>
 </body>
 </html>
