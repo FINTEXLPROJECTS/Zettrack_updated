@@ -5,11 +5,11 @@
   font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-/* ── Body: cool off-white ── */
+/* ── Body ── */
 body {
   display: flex;
   min-height: 100vh;
-  background: #f0f4f9;
+  background: #f5f5f5;
 }
 
 /* ═══════════════════════════
@@ -17,7 +17,7 @@ body {
 ═══════════════════════════ */
 .sidebar {
   width: 240px;
-  background: #1a2a3a;
+  background: #000000;
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -25,13 +25,13 @@ body {
   top: 0;
   left: 0;
   z-index: 200;
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.18);
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.25);
 }
 
 .sidebar-brand {
   padding: 28px 24px 22px;
-  border-bottom: 1px solid rgba(134, 188, 37, 0.2);
-  background: #152232;
+  border-bottom: 1px solid rgba(134, 188, 37, 0.25);
+  background: #111111;
 }
 
 .sidebar-brand .brand-name {
@@ -54,13 +54,13 @@ body {
   flex: 1;
   padding: 6px 0;
   overflow-y: auto;
-  background: #1a2a3a;
+  background: #000000;
 }
 
 .nav-section-label {
   font-size: 9px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.3);
   letter-spacing: 1.8px;
   text-transform: uppercase;
   padding: 14px 24px 4px;
@@ -89,13 +89,13 @@ body {
 
 .sidebar-nav a:hover {
   color: #ffffff;
-  background: rgba(134, 188, 37, 0.1);
+  background: rgba(134, 188, 37, 0.12);
   border-left-color: rgba(134, 188, 37, 0.5);
 }
 
 .sidebar-nav a.active {
   color: #86BC25;
-  background: rgba(134, 188, 37, 0.12);
+  background: rgba(134, 188, 37, 0.14);
   border-left-color: #86BC25;
   font-weight: 700;
 }
@@ -103,7 +103,7 @@ body {
 .sidebar-footer {
   padding: 18px 20px;
   border-top: 1px solid rgba(134, 188, 37, 0.15);
-  background: #152232;
+  background: #111111;
 }
 
 .logout-btn {
@@ -138,11 +138,11 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: #f0f4f9;
+  background: #f5f5f5;
 }
 
 /* ═══════════════════════════
-   TOPBAR  — pure white section
+   TOPBAR
 ═══════════════════════════ */
 .topbar {
   background: #ffffff;
@@ -155,18 +155,18 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
 .topbar-left h2 {
   font-size: 19px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #000000;
 }
 
 .topbar-left p {
   font-size: 12px;
-  color: #999;
+  color: #888;
   margin-top: 1px;
 }
 
@@ -181,19 +181,19 @@ body {
 }
 
 /* ═══════════════════════════
-   CONTENT AREA — soft cool-white
+   CONTENT AREA
 ═══════════════════════════ */
 .content {
   padding: 32px;
   flex: 1;
-  background: #f0f4f9;
+  background: #f5f5f5;
 }
 
 /* ═══════════════════════════
-   WELCOME BANNER — warm green-white
+   WELCOME BANNER
 ═══════════════════════════ */
 .welcome-banner {
-  background: #f0faf0;
+  background: #f8f8f8;
   border-radius: 16px;
   padding: 28px 36px;
   margin-bottom: 28px;
@@ -201,12 +201,12 @@ body {
   align-items: center;
   justify-content: space-between;
   border-left: 6px solid #86BC25;
-  box-shadow: 0 2px 14px rgba(134, 188, 37, 0.1);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
 }
 
 .welcome-banner h3 {
   font-size: 22px;
-  color: #2e6b00;
+  color: #000000;
   margin-bottom: 8px;
   font-weight: 700;
 }
@@ -233,7 +233,6 @@ body {
   margin-bottom: 28px;
 }
 
-/* ── Card: near-pure white ── */
 .card {
   background: #ffffff;
   border-radius: 14px;
@@ -258,13 +257,13 @@ body {
 .card h4 {
   font-size: 16px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #000000;
   margin-bottom: 8px;
 }
 
 .card p {
   font-size: 13px;
-  color: #666;
+  color: #555;
   line-height: 1.55;
 }
 
@@ -274,7 +273,7 @@ body {
 .section-title {
   font-size: 16px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #000000;
   margin-bottom: 18px;
   padding-bottom: 12px;
   border-bottom: 2px solid #86BC25;
@@ -284,13 +283,13 @@ body {
 }
 
 /* ═══════════════════════════
-   FORM PANEL — near white (slight warm)
+   FORM PANEL
 ═══════════════════════════ */
 .form-panel {
-  background: #fefefe;
+  background: #ffffff;
   border-radius: 14px;
   padding: 28px;
-  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
   margin-bottom: 24px;
   border-top: 3px solid #86BC25;
 }
@@ -312,7 +311,7 @@ body {
   outline: none;
   width: 100%;
   background: #ffffff;
-  color: #1a1a1a;
+  color: #000000;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -394,12 +393,12 @@ body {
 }
 
 .btn-secondary {
-  background: #3a4a5a;
+  background: #000000;
   color: #ffffff;
 }
 
 .btn-secondary:hover {
-  background: #2a3a4a;
+  background: #222222;
 }
 
 /* ═══════════════════════════
@@ -428,7 +427,7 @@ body {
 }
 
 /* ═══════════════════════════
-   TABLE PANEL — pure white
+   TABLE PANEL
 ═══════════════════════════ */
 .table-panel {
   background: #ffffff;
@@ -450,7 +449,7 @@ body {
 .table-header h4 {
   font-size: 15px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #000000;
 }
 
 table {
@@ -471,7 +470,7 @@ table thead th {
 
 table tbody td {
   padding: 13px 18px;
-  border-bottom: 1px solid #f4f4f4;
+  border-bottom: 1px solid #f0f0f0;
   color: #222;
 }
 
@@ -480,11 +479,11 @@ table tbody tr:last-child td {
 }
 
 table tbody tr:nth-child(even) {
-  background: #f8fffe;
+  background: #f8f8f8;
 }
 
 table tbody tr:hover {
-  background: #f0faf0;
+  background: #f2f2f2;
 }
 
 /* Empty state */
