@@ -1,41 +1,27 @@
-"""
-URL configuration for zettrak project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/6.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
+from django.contrib import admin
+from django.urls import path, include
 from django.http import HttpResponse
-
 
 
 def home(request):
     return HttpResponse("ZetTrak backend is running successfully")
 
 
-
-from django.contrib import admin
-from django.urls import path, include
-
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # template pages
+    # Template pages + auth API
     path('', include('accounts.urls')),
-
-    # api routes
     path('api/v1/auth/', include('accounts.urls')),
+
+    # New: Users & Roles API
+    path('api/v1/accounts/', include('accounts.api_urls')),
+
+    # Existing API routes (unchanged)
     path('api/v1/employees/', include('employees.urls')),
     path('api/v1/attendance/', include('attendance.urls')),
     path('api/v1/leaves/', include('leave_management.urls')),
+
+    # New: Companies API
+    path('api/v1/companies/', include('companies.urls')),
 ]

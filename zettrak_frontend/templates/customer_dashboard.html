@@ -1,0 +1,199 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - My Portal</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .customer-badge { background: #1e3a5f; }
+    .cust-welcome { background: #f0f7ff; border-left-color: #1e3a5f; }
+    .cust-welcome h3 { color: #1e3a5f; }
+    .action-card { cursor: pointer; }
+    .action-card:nth-child(1) { border-top-color: #1e3a5f; }
+    .action-card:nth-child(2) { border-top-color: #86BC25; }
+    .action-card:nth-child(3) { border-top-color: #f57c00; }
+    .profile-panel {
+      background: #f8fffe;
+      border-radius: 14px;
+      padding: 28px 32px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border-top: 3px solid #1e3a5f;
+      margin-top: 28px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .profile-avatar {
+      width: 72px;
+      height: 72px;
+      background: linear-gradient(135deg, #1e3a5f, #2d5f9a);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+    .profile-info h4 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 4px;
+    }
+    .profile-info p {
+      font-size: 13px;
+      color: #666;
+    }
+    .profile-badge {
+      display: inline-block;
+      margin-top: 8px;
+      background: rgba(30,58,95,0.1);
+      color: #1e3a5f;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .section-heading {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 16px;
+      margin-top: 30px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-name">ZetTrak</div>
+      <div class="brand-sub">Employee Portal</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/customer-dashboard/" class="active">
+        <span class="nav-icon">&#127968;</span> My Dashboard
+      </a>
+      <a href="/attendance-page/">
+        <span class="nav-icon">&#128203;</span> Attendance
+      </a>
+      <a href="/leaves-page/">
+        <span class="nav-icon">&#127807;</span> Apply Leave
+      </a>
+      <a href="/leave-history-page/">
+        <span class="nav-icon">&#128202;</span> My Leave History
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span>&#128682;</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>My Portal</h2>
+        <p>Employee self-service dashboard</p>
+      </div>
+      <span class="topbar-badge customer-badge">&#128100; Employee</span>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+      <!-- PROFILE PANEL -->
+      <div class="profile-panel">
+        <div class="profile-avatar">&#128100;</div>
+        <div class="profile-info">
+          <h4 id="profileName">Loading...</h4>
+          <p>Employee Account &nbsp;|&nbsp; ZetTrak HRMS</p>
+          <span class="profile-badge">&#10003; Active Employee</span>
+        </div>
+      </div>
+
+      <!-- WELCOME BANNER -->
+      <div class="welcome-banner cust-welcome" style="margin-top: 20px;">
+        <div>
+          <h3 id="welcomeName">Welcome!</h3>
+          <p>Manage your attendance, leave requests, and personal records all from your portal.</p>
+        </div>
+        <span class="welcome-icon">&#128188;</span>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="section-heading">&#9889; Quick Actions</div>
+      <div class="cards">
+        <div class="card action-card" onclick="window.location.href='/attendance-page/'">
+          <span class="card-icon">&#128203;</span>
+          <h4>Check In / Out</h4>
+          <p>Record your daily attendance — mark your arrival and departure.</p>
+        </div>
+        <div class="card action-card" onclick="window.location.href='/leaves-page/'">
+          <span class="card-icon">&#127807;</span>
+          <h4>Apply for Leave</h4>
+          <p>Submit a new leave request with your reason and selected dates.</p>
+        </div>
+        <div class="card action-card" onclick="window.location.href='/leave-history-page/'">
+          <span class="card-icon">&#128202;</span>
+          <h4>My Leave History</h4>
+          <p>Track the status and details of all your leave applications.</p>
+        </div>
+      </div>
+
+      <!-- INFO SECTION -->
+      <div class="section-heading">&#128276; Your Portal Features</div>
+      <div class="cards">
+        <div class="card" style="border-top-color: #86BC25; background: #f9fff5;">
+          <span class="card-icon">&#9200;</span>
+          <h4>Attendance Tracking</h4>
+          <p>View your complete attendance records with check-in and check-out times.</p>
+        </div>
+        <div class="card" style="border-top-color: #f57c00; background: #fffdf5;">
+          <span class="card-icon">&#128197;</span>
+          <h4>Leave Management</h4>
+          <p>Apply for leaves and track approvals or rejections in real-time.</p>
+        </div>
+        <div class="card" style="border-top-color: #7b1fa2; background: #fdf5ff;">
+          <span class="card-icon">&#128196;</span>
+          <h4>Leave Balance</h4>
+          <p>Check your remaining leave balance for different leave categories.</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    function logout() {
+      localStorage.removeItem("access");
+      localStorage.removeItem("refresh");
+      localStorage.removeItem("username");
+      localStorage.removeItem("userType");
+      window.location.href = "/login-page/";
+    }
+
+    const username = localStorage.getItem("username");
+    if (username) {
+      document.getElementById("welcomeName").textContent = "Welcome back, " + username + "!";
+      document.getElementById("profileName").textContent = username;
+    }
+
+    // Redirect admin users away from customer portal
+    const userType = localStorage.getItem("userType");
+    if (!localStorage.getItem("access")) {
+      window.location.href = "/login-page/";
+    }
+  </script>
+
+</body>
+</html>

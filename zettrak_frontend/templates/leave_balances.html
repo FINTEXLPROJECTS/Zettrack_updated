@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - Leave Balances</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .balance-bar-wrap { width:120px; background:#f0f0f0; border-radius:10px; height:8px; display:inline-block; vertical-align:middle; margin-left:8px; }
+    .balance-bar-fill { height:8px; background:#86BC25; border-radius:10px; transition:width 0.3s; }
+  </style>
+</head>
+<body>
+
+  {% with active_page='leave_balances' %}{% include '_sidebar.html' %}{% endwith %}
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#9878; Leave Balances</h2>
+        <p>View employee leave balance records</p>
+      </div>
+      <span class="topbar-badge">&#9881; Admin</span>
+    </header>
+
+    <main class="content">
+
+      <div class="form-panel">
+        <div class="section-title"><span>&#9878;</span> Leave Balance Records</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="loadBalances()">&#8635; Refresh Balances</button>
+        </div>
+        <p id="balanceMsg" class="message"></p>
+      </div>
+
+      <div class="table-panel">
+        <div class="table-header"><h4>&#9878; All Leave Balances</h4></div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Employee</th><th>Leave Type</th><th>Balance (Days)</th></tr>
+          </thead>
+          <tbody id="balanceTableBody">
+            <tr class="empty-row"><td colspan="4">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() { localStorage.clear(); window.location.href = "/login-page/"; }
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("balanceMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
+    }
+
+    async function loadBalances() {
+      const tbody = document.getElementById("balanceTableBody");
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='4'>Loading...</td></tr>";
+      try {
+        const res = await fetch(API_BASE + "leaves/balance/", { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { tbody.innerHTML = "<tr class='empty-row'><td colspan='4'>Failed to load</td></tr>"; return; }
+        if (data.length === 0) { tbody.innerHTML = "<tr class='empty-row'><td colspan='4'>No leave balance records found</td></tr>"; return; }
+        tbody.innerHTML = "";
+        const maxBalance = Math.max(...data.map(b => b.balance || 0), 1);
+        data.forEach(b => {
+          const tr = document.createElement("tr");
+          const pct = Math.round(((b.balance || 0) / maxBalance) * 100);
+          tr.innerHTML = `<td>${b.id??""}</td><td>${b.employee??""}</td><td>${b.leave_type??""}</td><td>
+            <strong>${b.balance??0}</strong> days
+            <span class="balance-bar-wrap"><span class="balance-bar-fill" style="width:${pct}%;"></span></span>
+          </td>`;
+          tbody.appendChild(tr);
+        });
+        showMsg("Loaded " + data.length + " balance records");
+      } catch { tbody.innerHTML = "<tr class='empty-row'><td colspan='4'>Server connection failed</td></tr>"; }
+    }
+
+    loadBalances();
+  </script>
+</body>
+</html>

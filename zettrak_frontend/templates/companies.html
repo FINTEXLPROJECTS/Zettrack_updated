@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - Companies</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .del-btn { padding:4px 10px; background:#e53935; color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; }
+    .del-btn:hover { opacity:0.85; }
+    .badge-active-co { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; background:#e8f5e9; color:#2e7d32; }
+    .badge-inactive-co { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; background:#fce4ec; color:#c62828; }
+  </style>
+</head>
+<body>
+
+  {% with active_page='companies' %}{% include '_sidebar.html' %}{% endwith %}
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#127963; Companies</h2>
+        <p>Manage registered companies</p>
+      </div>
+      <span class="topbar-badge">&#9881; Admin</span>
+    </header>
+
+    <main class="content">
+
+      <!-- Add Company Form -->
+      <div class="form-panel">
+        <div class="section-title"><span>&#43;</span> Add New Company</div>
+        <div class="form-grid">
+          <input type="text"  id="c_name"    placeholder="Company Name *" />
+          <input type="text"  id="c_code"    placeholder="Company Code * (unique)" />
+          <input type="email" id="c_email"   placeholder="Company Email" />
+          <input type="text"  id="c_phone"   placeholder="Phone" />
+          <textarea           id="c_address" placeholder="Address"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="addCompany()">&#43; Add Company</button>
+          <button class="btn btn-secondary" onclick="loadCompanies()">&#8635; Refresh</button>
+        </div>
+        <p id="companyMsg" class="message"></p>
+      </div>
+
+      <!-- Companies Table -->
+      <div class="table-panel">
+        <div class="table-header"><h4>&#127963; All Companies</h4></div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Code</th><th>Email</th><th>Phone</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody id="companyTableBody">
+            <tr class="empty-row"><td colspan="7">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    const API_BASE = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() { localStorage.clear(); window.location.href = "/login-page/"; }
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("companyMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
+    }
+
+    async function addCompany() {
+      const payload = {
+        name: document.getElementById("c_name").value.trim(),
+        company_code: document.getElementById("c_code").value.trim(),
+        email: document.getElementById("c_email").value,
+        phone: document.getElementById("c_phone").value,
+        address: document.getElementById("c_address").value,
+        is_active: true
+      };
+      if (!payload.name || !payload.company_code) { showMsg("Company name and code are required", true); return; }
+      try {
+        const res = await fetch(API_BASE + "companies/", { method: "POST", headers: authHeaders(), body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) { showMsg("Failed: " + JSON.stringify(data), true); return; }
+        showMsg("Company added successfully");
+        document.getElementById("c_name").value = "";
+        document.getElementById("c_code").value = "";
+        loadCompanies();
+      } catch { showMsg("Server connection failed", true); }
+    }
+
+    async function deleteCompany(id, name) {
+      if (!confirm("Delete company '" + name + "'? This cannot be undone.")) return;
+      try {
+        const res = await fetch(`${API_BASE}companies/${id}/`, { method: "DELETE", headers: authHeaders() });
+        if (res.status === 204 || res.ok) { showMsg("Company deleted"); loadCompanies(); }
+        else showMsg("Failed to delete", true);
+      } catch { showMsg("Server error", true); }
+    }
+
+    async function loadCompanies() {
+      const tbody = document.getElementById("companyTableBody");
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='7'>Loading...</td></tr>";
+      try {
+        const res = await fetch(API_BASE + "companies/", { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { tbody.innerHTML = "<tr class='empty-row'><td colspan='7'>Failed to load</td></tr>"; return; }
+        if (data.length === 0) { tbody.innerHTML = "<tr class='empty-row'><td colspan='7'>No companies found. Add one above.</td></tr>"; return; }
+        tbody.innerHTML = "";
+        data.forEach(c => {
+          const tr = document.createElement("tr");
+          const badge = c.is_active ? '<span class="badge-active-co">Active</span>' : '<span class="badge-inactive-co">Inactive</span>';
+          tr.innerHTML = `<td>${c.id??""}</td><td><strong>${c.name??""}</strong></td><td>${c.company_code??""}</td><td>${c.email??""}</td><td>${c.phone??""}</td><td>${badge}</td><td><button class="del-btn" onclick="deleteCompany(${c.id},'${(c.name||"").replace(/'/g,"\\'")}')">&#128465; Delete</button></td>`;
+          tbody.appendChild(tr);
+        });
+      } catch { tbody.innerHTML = "<tr class='empty-row'><td colspan='7'>Server connection failed</td></tr>"; }
+    }
+
+    loadCompanies();
+  </script>
+</body>
+</html>

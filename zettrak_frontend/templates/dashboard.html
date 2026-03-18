@@ -4,43 +4,142 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZetTrak - Dashboard</title>
+  <title>ZetTrak - Admin Dashboard</title>
   <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    /* ── STAT CARDS ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      border-radius: 14px;
+      padding: 24px 22px;
+      box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::after {
+      content: attr(data-icon);
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 44px;
+      opacity: 0.12;
+    }
+    .stat-card.sc-green  { background: #f4fde8; border-top: 4px solid #86BC25; }
+    .stat-card.sc-blue   { background: #f0f7ff; border-top: 4px solid #1e3a5f; }
+    .stat-card.sc-orange { background: #fff8f0; border-top: 4px solid #f57c00; }
+    .stat-card.sc-purple { background: #fdf5ff; border-top: 4px solid #7b1fa2; }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .sc-green  .stat-label { color: #5a8a00; }
+    .sc-blue   .stat-label { color: #1e3a5f; }
+    .sc-orange .stat-label { color: #bf5500; }
+    .sc-purple .stat-label { color: #5c1080; }
+    .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .sc-green  .stat-value { color: #86BC25; }
+    .sc-blue   .stat-value { color: #1e3a5f; }
+    .sc-orange .stat-value { color: #f57c00; }
+    .sc-purple .stat-value { color: #7b1fa2; }
+    .stat-sub {
+      font-size: 12px;
+      color: #888;
+    }
+    /* ── SECTION HEADING ── */
+    .dash-section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #333;
+      margin: 28px 0 16px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e8e8e8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    /* ── QUICK NAV CARDS ── */
+    .nav-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .nav-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 26px 22px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .nav-card:hover {
+      box-shadow: 0 8px 28px rgba(0,0,0,0.14);
+      transform: translateY(-3px);
+    }
+    .nav-card:nth-child(1) { border-top: 4px solid #86BC25; }
+    .nav-card:nth-child(2) { border-top: 4px solid #1e3a5f; }
+    .nav-card:nth-child(3) { border-top: 4px solid #f57c00; }
+    .nav-card:nth-child(4) { border-top: 4px solid #7b1fa2; }
+    .nav-card:nth-child(5) { border-top: 4px solid #00796b; }
+    .nav-card-icon { font-size: 32px; }
+    .nav-card h4 { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+    .nav-card p  { font-size: 13px; color: #666; line-height: 1.5; }
+    .nav-card-arrow {
+      font-size: 18px;
+      color: #ccc;
+      align-self: flex-end;
+      margin-top: auto;
+    }
+    /* ── RECENT ACTIVITY ── */
+    .activity-panel {
+      background: #f8fffe;
+      border-radius: 14px;
+      padding: 24px 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border-top: 3px solid #86BC25;
+    }
+    .activity-list { list-style: none; }
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-green  { background: #86BC25; }
+    .dot-blue   { background: #1e3a5f; }
+    .dot-orange { background: #f57c00; }
+    .activity-text { font-size: 13px; color: #444; flex: 1; }
+    .activity-time { font-size: 11px; color: #aaa; }
+  </style>
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-name">ZetTrak</div>
-      <div class="brand-sub">HRMS System</div>
-    </div>
-    <nav class="sidebar-nav">
-      <a href="/dashboard/" class="active">
-        <span class="nav-icon">&#127968;</span> Dashboard
-      </a>
-      <a href="/employees-page/">
-        <span class="nav-icon">&#128101;</span> Employees
-      </a>
-      <a href="/attendance-page/">
-        <span class="nav-icon">&#128203;</span> Attendance
-      </a>
-      <a href="/leaves-page/">
-        <span class="nav-icon">&#127807;</span> Leaves
-      </a>
-      <a href="/leave-history-page/">
-        <span class="nav-icon">&#128202;</span> Leave History
-      </a>
-      <a href="/admin/">
-        <span class="nav-icon">&#9881;</span> Admin
-      </a>
-    </nav>
-    <div class="sidebar-footer">
-      <button class="logout-btn" onclick="logout()">
-        <span>&#128682;</span> Logout
-      </button>
-    </div>
-  </aside>
+  {% with active_page='dashboard' %}{% include '_sidebar.html' %}{% endwith %}
 
   <!-- MAIN WRAPPER -->
   <div class="main-wrapper">
@@ -48,55 +147,163 @@
     <!-- TOPBAR -->
     <header class="topbar">
       <div class="topbar-left">
-        <h2>Dashboard</h2>
-        <p>Welcome back to your HRMS panel</p>
+        <h2>&#127968; Admin Dashboard</h2>
+        <p id="topbarSub">Welcome back to your HRMS control panel</p>
       </div>
-      <span class="topbar-badge">ZetTrak</span>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span style="font-size:13px; color:#888;" id="topbarUser"></span>
+        <span class="topbar-badge">&#9881; Admin</span>
+      </div>
     </header>
 
     <!-- CONTENT -->
     <main class="content">
 
+      <!-- WELCOME BANNER -->
       <div class="welcome-banner">
         <div>
-          <h3>Welcome to ZetTrak HRMS</h3>
-          <p>Manage your workforce efficiently.<br>Track attendance, leaves, and employee records all in one place.</p>
+          <h3 id="welcomeMsg">Welcome, Admin!</h3>
+          <p>You have full access to manage employees, track attendance, handle leaves, and oversee your entire workforce.</p>
         </div>
         <span class="welcome-icon">&#128188;</span>
       </div>
 
-      <div class="cards">
-        <div class="card" onclick="window.location.href='/employees-page/'">
-          <span class="card-icon">&#128101;</span>
+      <!-- STAT CARDS -->
+      <div class="dash-section-title">&#128200; Overview</div>
+      <div class="stats-row">
+        <div class="stat-card sc-green" data-icon="👥">
+          <div class="stat-label">Total Employees</div>
+          <div class="stat-value" id="statEmployees">—</div>
+          <div class="stat-sub">Registered in system</div>
+        </div>
+        <div class="stat-card sc-blue" data-icon="📋">
+          <div class="stat-label">Attendance Records</div>
+          <div class="stat-value" id="statAttendance">—</div>
+          <div class="stat-sub">All time check-ins</div>
+        </div>
+        <div class="stat-card sc-orange" data-icon="🌿">
+          <div class="stat-label">Leave Requests</div>
+          <div class="stat-value" id="statLeaves">—</div>
+          <div class="stat-sub">Submitted applications</div>
+        </div>
+        <div class="stat-card sc-purple" data-icon="⚙️">
+          <div class="stat-label">System Status</div>
+          <div class="stat-value" style="font-size:22px; padding-top:4px;">&#128994; Live</div>
+          <div class="stat-sub">All services running</div>
+        </div>
+      </div>
+
+      <!-- NAVIGATION CARDS -->
+      <div class="dash-section-title">&#9889; Quick Navigation</div>
+      <div class="nav-cards">
+        <div class="nav-card" onclick="window.location.href='/employees-page/'">
+          <span class="nav-card-icon">&#128101;</span>
           <h4>Employees</h4>
-          <p>Manage employee details, records, and profiles.</p>
+          <p>Add, view and manage all employee records and profiles.</p>
+          <span class="nav-card-arrow">&#8594;</span>
         </div>
-        <div class="card" onclick="window.location.href='/attendance-page/'">
-          <span class="card-icon">&#128203;</span>
+        <div class="nav-card" onclick="window.location.href='/attendance-page/'">
+          <span class="nav-card-icon">&#128203;</span>
           <h4>Attendance</h4>
-          <p>Track employee check-in and check-out records daily.</p>
+          <p>Track daily check-in / check-out and view attendance history.</p>
+          <span class="nav-card-arrow">&#8594;</span>
         </div>
-        <div class="card" onclick="window.location.href='/leaves-page/'">
-          <span class="card-icon">&#127807;</span>
-          <h4>Leaves</h4>
-          <p>Apply and manage leave requests for employees.</p>
+        <div class="nav-card" onclick="window.location.href='/leaves-page/'">
+          <span class="nav-card-icon">&#127807;</span>
+          <h4>Apply Leave</h4>
+          <p>Submit and manage leave requests for employees.</p>
+          <span class="nav-card-arrow">&#8594;</span>
         </div>
-        <div class="card" onclick="window.location.href='/leave-history-page/'">
-          <span class="card-icon">&#128202;</span>
+        <div class="nav-card" onclick="window.location.href='/leave-history-page/'">
+          <span class="nav-card-icon">&#128202;</span>
           <h4>Leave History</h4>
-          <p>View complete history of all leave applications.</p>
+          <p>Browse full history of all leave applications and their statuses.</p>
+          <span class="nav-card-arrow">&#8594;</span>
         </div>
+        <div class="nav-card" onclick="window.location.href='/admin/'">
+          <span class="nav-card-icon">&#9881;</span>
+          <h4>Django Admin</h4>
+          <p>Advanced system configuration and database management.</p>
+          <span class="nav-card-arrow">&#8594;</span>
+        </div>
+      </div>
+
+      <!-- RECENT ACTIVITY -->
+      <div class="dash-section-title">&#128336; System Info</div>
+      <div class="activity-panel">
+        <ul class="activity-list">
+          <li class="activity-item">
+            <span class="activity-dot dot-green"></span>
+            <span class="activity-text">ZetTrak HRMS backend is running successfully</span>
+            <span class="activity-time">Live</span>
+          </li>
+          <li class="activity-item">
+            <span class="activity-dot dot-blue"></span>
+            <span class="activity-text">JWT authentication is active &amp; secure</span>
+            <span class="activity-time">Active</span>
+          </li>
+          <li class="activity-item">
+            <span class="activity-dot dot-orange"></span>
+            <span class="activity-text">All HRMS modules: Employees, Attendance, Leaves are operational</span>
+            <span class="activity-time">Healthy</span>
+          </li>
+          <li class="activity-item">
+            <span class="activity-dot dot-green"></span>
+            <span class="activity-text">Admin session authenticated via secure token</span>
+            <span class="activity-time">Now</span>
+          </li>
+        </ul>
       </div>
 
     </main>
   </div>
 
   <script>
+    const API = "/api/v1/";
+    const token = localStorage.getItem("access");
+
+    if (!token) {
+      window.location.href = "/login-page/";
+    }
+
+    // Show username
+    const username = localStorage.getItem("username");
+    if (username) {
+      document.getElementById("welcomeMsg").textContent = "Welcome back, " + username + "!";
+      document.getElementById("topbarUser").textContent = username;
+    }
+
+    function authHeader() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + token };
+    }
+
+    // Load stats
+    fetch(API + "employees/", { headers: authHeader() })
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) document.getElementById("statEmployees").textContent = data.length;
+      }).catch(() => {});
+
+    fetch(API + "attendance/history/", { headers: authHeader() })
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) document.getElementById("statAttendance").textContent = data.length;
+      }).catch(() => {});
+
+    fetch(API + "leaves/history/", { headers: authHeader() })
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data)) document.getElementById("statLeaves").textContent = data.length;
+      }).catch(() => {});
+
     function logout() {
       localStorage.removeItem("access");
       localStorage.removeItem("refresh");
+      localStorage.removeItem("username");
+      localStorage.removeItem("userType");
       window.location.href = "/login-page/";
     }
   </script>
+
 </body>
 </html>

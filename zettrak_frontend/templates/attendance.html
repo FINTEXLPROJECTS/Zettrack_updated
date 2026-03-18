@@ -9,91 +9,38 @@
 </head>
 <body>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-name">ZetTrak</div>
-      <div class="brand-sub">HRMS System</div>
-    </div>
-    <nav class="sidebar-nav">
-      <a href="/dashboard/">
-        <span class="nav-icon">&#127968;</span> Dashboard
-      </a>
-      <a href="/employees-page/">
-        <span class="nav-icon">&#128101;</span> Employees
-      </a>
-      <a href="/attendance-page/" class="active">
-        <span class="nav-icon">&#128203;</span> Attendance
-      </a>
-      <a href="/leaves-page/">
-        <span class="nav-icon">&#127807;</span> Leaves
-      </a>
-      <a href="/leave-history-page/">
-        <span class="nav-icon">&#128202;</span> Leave History
-      </a>
-      <a href="/admin/">
-        <span class="nav-icon">&#9881;</span> Admin
-      </a>
-    </nav>
-    <div class="sidebar-footer">
-      <button class="logout-btn" onclick="logout()">
-        <span>&#128682;</span> Logout
-      </button>
-    </div>
-  </aside>
+  {% with active_page='attendance' %}{% include '_sidebar.html' %}{% endwith %}
 
-  <!-- MAIN WRAPPER -->
   <div class="main-wrapper">
-
-    <!-- TOPBAR -->
     <header class="topbar">
       <div class="topbar-left">
-        <h2>Attendance</h2>
+        <h2>&#128203; Attendance</h2>
         <p>Track employee check-in and check-out</p>
       </div>
-      <span class="topbar-badge">ZetTrak</span>
+      <span class="topbar-badge">&#9881; Admin</span>
     </header>
 
-    <!-- CONTENT -->
     <main class="content">
 
-      <!-- Check In / Out Panel -->
       <div class="form-panel">
-        <div class="section-title">
-          <span>&#128203;</span> Mark Attendance
-        </div>
-        <input
-          type="number"
-          id="employeeId"
-          class="standalone-input"
-          placeholder="Enter Employee ID"
-        />
+        <div class="section-title"><span>&#128203;</span> Mark Attendance</div>
+        <input type="number" id="employeeId" class="standalone-input" placeholder="Enter Employee ID" />
         <div class="btn-row">
           <button class="btn btn-primary" onclick="checkIn()">&#9989; Check In</button>
           <button class="btn btn-secondary" onclick="checkOut()">&#128683; Check Out</button>
-          <button class="btn btn-secondary" onclick="loadAttendanceHistory()">&#8635; Load History</button>
+          <button class="btn btn-secondary" onclick="loadAttendanceHistory()">&#8635; Refresh Records</button>
         </div>
         <p id="attendanceMsg" class="message"></p>
       </div>
 
-      <!-- Attendance Table -->
       <div class="table-panel">
-        <div class="table-header">
-          <h4>&#128203; Attendance Records</h4>
-        </div>
+        <div class="table-header"><h4>&#128203; All Attendance Records</h4></div>
         <table>
           <thead>
-            <tr>
-              <th>ID</th>
-              <th>Employee</th>
-              <th>Date</th>
-              <th>Check In</th>
-              <th>Check Out</th>
-              <th>Status</th>
-            </tr>
+            <tr><th>ID</th><th>Employee</th><th>Date</th><th>Check In</th><th>Check Out</th><th>Status</th></tr>
           </thead>
           <tbody id="attendanceTableBody">
-            <tr class="empty-row"><td colspan="6">Click "Load History" to view records</td></tr>
+            <tr class="empty-row"><td colspan="6">Loading records...</td></tr>
           </tbody>
         </table>
       </div>
@@ -103,20 +50,13 @@
 
   <script>
     const API_BASE = window.location.origin + "/api/v1/";
-
     function authHeaders() {
-      return {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + localStorage.getItem("access")
-      };
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
     }
-
     function logout() {
-      localStorage.removeItem("access");
-      localStorage.removeItem("refresh");
+      localStorage.clear();
       window.location.href = "/login-page/";
     }
-
     function showMsg(text, isError = false) {
       const el = document.getElementById("attendanceMsg");
       el.innerText = text;
@@ -125,89 +65,47 @@
 
     async function checkIn() {
       const employee = document.getElementById("employeeId").value;
+      if (!employee) { showMsg("Please enter Employee ID", true); return; }
       try {
-        const response = await fetch(API_BASE + "attendance/check-in/", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify({ employee })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          showMsg(data.error || "Check-in failed", true);
-          return;
-        }
-
-        showMsg("Check-in successful");
-        loadAttendanceHistory();
-      } catch (error) {
-        showMsg("Server connection failed", true);
-      }
+        const res = await fetch(API_BASE + "attendance/check-in/", { method: "POST", headers: authHeaders(), body: JSON.stringify({ employee }) });
+        const data = await res.json();
+        showMsg(res.ok ? "Check-in successful" : (data.error || "Check-in failed"), !res.ok);
+        if (res.ok) loadAttendanceHistory();
+      } catch { showMsg("Server connection failed", true); }
     }
 
     async function checkOut() {
       const employee = document.getElementById("employeeId").value;
+      if (!employee) { showMsg("Please enter Employee ID", true); return; }
       try {
-        const response = await fetch(API_BASE + "attendance/check-out/", {
-          method: "POST",
-          headers: authHeaders(),
-          body: JSON.stringify({ employee })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          showMsg(data.error || "Check-out failed", true);
-          return;
-        }
-
-        showMsg("Check-out successful");
-        loadAttendanceHistory();
-      } catch (error) {
-        showMsg("Server connection failed", true);
-      }
+        const res = await fetch(API_BASE + "attendance/check-out/", { method: "POST", headers: authHeaders(), body: JSON.stringify({ employee }) });
+        const data = await res.json();
+        showMsg(res.ok ? "Check-out successful" : (data.error || "Check-out failed"), !res.ok);
+        if (res.ok) loadAttendanceHistory();
+      } catch { showMsg("Server connection failed", true); }
     }
 
     async function loadAttendanceHistory() {
       const tbody = document.getElementById("attendanceTableBody");
       tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Loading...</td></tr>";
-
       try {
-        const response = await fetch(API_BASE + "attendance/history/", {
-          method: "GET",
-          headers: authHeaders()
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Failed to load records</td></tr>";
-          return;
-        }
-
-        if (data.length === 0) {
-          tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>No attendance records found</td></tr>";
-          return;
-        }
-
+        const res = await fetch(API_BASE + "attendance/history/", { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Failed to load</td></tr>"; return; }
+        if (data.length === 0) { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>No attendance records found</td></tr>"; return; }
         tbody.innerHTML = "";
         data.forEach(item => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${item.id ?? ""}</td>
-            <td>${item.employee ?? ""}</td>
-            <td>${item.date ?? ""}</td>
-            <td>${item.check_in ?? "-"}</td>
-            <td>${item.check_out ?? "-"}</td>
-            <td>${item.status ?? ""}</td>
-          `;
-          tbody.appendChild(row);
+          const tr = document.createElement("tr");
+          const ci = item.check_in ? new Date(item.check_in).toLocaleTimeString() : "-";
+          const co = item.check_out ? new Date(item.check_out).toLocaleTimeString() : "-";
+          const statusColor = item.status === 'Present' ? '#2e7d32' : '#888';
+          tr.innerHTML = `<td>${item.id??""}</td><td>${item.employee??""}</td><td>${item.date??""}</td><td>${ci}</td><td>${co}</td><td style="color:${statusColor};font-weight:600;">${item.status??""}</td>`;
+          tbody.appendChild(tr);
         });
-      } catch (error) {
-        tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Server connection failed</td></tr>";
-      }
+      } catch { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Server connection failed</td></tr>"; }
     }
+
+    loadAttendanceHistory();
   </script>
 </body>
 </html>
