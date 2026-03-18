@@ -8,17 +8,17 @@
   <link rel="stylesheet" href="{% static 'app.css' %}" />
   <style>
     /* ── CUSTOMER THEME ── */
-    .customer-badge { background: #1e3a5f; }
-    .cust-welcome   { background: #f0f7ff; border-left-color: #1e3a5f; }
-    .cust-welcome h3 { color: #1e3a5f; }
+    .customer-badge { background: #000000; }
+    .cust-welcome   { background: #f8f8f8; border-left-color: #86BC25; }
+    .cust-welcome h3 { color: #000000; }
 
     /* ── PROFILE CARD ── */
     .profile-card {
       background: #ffffff;
       border-radius: 18px;
       padding: 32px 36px;
-      box-shadow: 0 4px 20px rgba(30,58,95,0.1);
-      border-top: 5px solid #1e3a5f;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      border-top: 5px solid #86BC25;
       display: flex;
       align-items: center;
       gap: 28px;
@@ -28,25 +28,25 @@
       width: 86px;
       height: 86px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #1e3a5f, #2d6fa8);
+      background: #000000;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 38px;
       flex-shrink: 0;
-      box-shadow: 0 4px 14px rgba(30,58,95,0.3);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.2);
     }
     .profile-details { flex: 1; }
     .profile-details h3 {
       font-size: 24px;
       font-weight: 800;
-      color: #1e3a5f;
+      color: #000000;
       margin-bottom: 4px;
     }
     .profile-code {
       display: inline-block;
-      background: rgba(30,58,95,0.1);
-      color: #1e3a5f;
+      background: rgba(134,188,37,0.12);
+      color: #86BC25;
       padding: 3px 14px;
       border-radius: 20px;
       font-size: 12px;
@@ -81,14 +81,14 @@
     .meta-value {
       font-size: 13px;
       font-weight: 600;
-      color: #333;
+      color: #000000;
     }
     .profile-status {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #e8f5e9;
-      color: #2e7d32;
+      background: rgba(134,188,37,0.12);
+      color: #86BC25;
       padding: 6px 16px;
       border-radius: 20px;
       font-size: 12px;
@@ -100,17 +100,15 @@
     .section-heading {
       font-size: 15px;
       font-weight: 700;
-      color: #333;
+      color: #000000;
       margin: 28px 0 16px;
       padding-bottom: 10px;
-      border-bottom: 2px solid #e8e8e8;
+      border-bottom: 2px solid #86BC25;
     }
 
     /* ── ACTION CARDS ── */
     .action-card { cursor: pointer; }
-    .action-card:nth-child(1) { border-top-color: #1e3a5f; }
-    .action-card:nth-child(2) { border-top-color: #86BC25; }
-    .action-card:nth-child(3) { border-top-color: #f57c00; }
+    .action-card:nth-child(even) { border-top-color: #000000; background: #f8f8f8; }
 
     @media (max-width: 640px) {
       .profile-card { flex-direction: column; text-align: center; }
@@ -229,17 +227,17 @@
       <!-- PORTAL INFO -->
       <div class="section-heading">&#128276; Portal Features</div>
       <div class="cards">
-        <div class="card" style="border-top-color:#86BC25; background:#f9fff5;">
+        <div class="card">
           <span class="card-icon">&#9200;</span>
           <h4>Attendance Tracking</h4>
           <p>View your complete attendance records with check-in and check-out times.</p>
         </div>
-        <div class="card" style="border-top-color:#f57c00; background:#fffdf5;">
+        <div class="card" style="border-top-color:#000000; background:#f8f8f8;">
           <span class="card-icon">&#128197;</span>
           <h4>Leave Management</h4>
           <p>Apply for leaves and track approvals or rejections in real-time.</p>
         </div>
-        <div class="card" style="border-top-color:#7b1fa2; background:#fdf5ff;">
+        <div class="card">
           <span class="card-icon">&#128196;</span>
           <h4>Leave Balance</h4>
           <p>Check your remaining leave balance for different leave categories.</p>

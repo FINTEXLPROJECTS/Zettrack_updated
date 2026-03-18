@@ -15,11 +15,17 @@
       margin-bottom: 28px;
     }
     .stat-card {
+      background: #ffffff;
       border-radius: 14px;
       padding: 24px 22px;
-      box-shadow: 0 2px 14px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 14px rgba(0,0,0,0.07);
       position: relative;
       overflow: hidden;
+      border-top: 4px solid #86BC25;
+    }
+    .stat-card.sc-alt {
+      background: #f8f8f8;
+      border-top-color: #000000;
     }
     .stat-card::after {
       content: attr(data-icon);
@@ -28,33 +34,25 @@
       top: 50%;
       transform: translateY(-50%);
       font-size: 44px;
-      opacity: 0.12;
+      opacity: 0.1;
     }
-    .stat-card.sc-green  { background: #f4fde8; border-top: 4px solid #86BC25; }
-    .stat-card.sc-blue   { background: #f0f7ff; border-top: 4px solid #1e3a5f; }
-    .stat-card.sc-orange { background: #fff8f0; border-top: 4px solid #f57c00; }
-    .stat-card.sc-purple { background: #fdf5ff; border-top: 4px solid #7b1fa2; }
     .stat-label {
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
       margin-bottom: 10px;
+      color: #000000;
     }
-    .sc-green  .stat-label { color: #5a8a00; }
-    .sc-blue   .stat-label { color: #1e3a5f; }
-    .sc-orange .stat-label { color: #bf5500; }
-    .sc-purple .stat-label { color: #5c1080; }
+    .stat-card.sc-alt .stat-label { color: #000000; }
     .stat-value {
       font-size: 36px;
       font-weight: 800;
       line-height: 1;
       margin-bottom: 4px;
+      color: #86BC25;
     }
-    .sc-green  .stat-value { color: #86BC25; }
-    .sc-blue   .stat-value { color: #1e3a5f; }
-    .sc-orange .stat-value { color: #f57c00; }
-    .sc-purple .stat-value { color: #7b1fa2; }
+    .stat-card.sc-alt .stat-value { color: #000000; }
     .stat-sub {
       font-size: 12px;
       color: #888;
@@ -63,10 +61,10 @@
     .dash-section-title {
       font-size: 15px;
       font-weight: 700;
-      color: #333;
+      color: #000000;
       margin: 28px 0 16px;
       padding-bottom: 10px;
-      border-bottom: 2px solid #e8e8e8;
+      border-bottom: 2px solid #86BC25;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -83,33 +81,31 @@
       border-radius: 14px;
       padding: 26px 22px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      border-top: 4px solid #86BC25;
       cursor: pointer;
       transition: box-shadow 0.2s, transform 0.2s;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
+    .nav-card:nth-child(even) { border-top-color: #000000; background: #f8f8f8; }
     .nav-card:hover {
-      box-shadow: 0 8px 28px rgba(0,0,0,0.14);
+      box-shadow: 0 8px 28px rgba(134,188,37,0.18);
       transform: translateY(-3px);
     }
-    .nav-card:nth-child(1) { border-top: 4px solid #86BC25; }
-    .nav-card:nth-child(2) { border-top: 4px solid #1e3a5f; }
-    .nav-card:nth-child(3) { border-top: 4px solid #f57c00; }
-    .nav-card:nth-child(4) { border-top: 4px solid #7b1fa2; }
-    .nav-card:nth-child(5) { border-top: 4px solid #00796b; }
     .nav-card-icon { font-size: 32px; }
-    .nav-card h4 { font-size: 15px; font-weight: 700; color: #1a1a1a; }
-    .nav-card p  { font-size: 13px; color: #666; line-height: 1.5; }
+    .nav-card h4 { font-size: 15px; font-weight: 700; color: #000000; }
+    .nav-card p  { font-size: 13px; color: #555; line-height: 1.5; }
     .nav-card-arrow {
       font-size: 18px;
-      color: #ccc;
+      color: #86BC25;
       align-self: flex-end;
       margin-top: auto;
+      font-weight: 700;
     }
     /* ── RECENT ACTIVITY ── */
     .activity-panel {
-      background: #f8fffe;
+      background: #f8f8f8;
       border-radius: 14px;
       padding: 24px 28px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.06);
@@ -121,7 +117,7 @@
       align-items: center;
       gap: 14px;
       padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid #eeeeee;
     }
     .activity-item:last-child { border-bottom: none; }
     .activity-dot {
@@ -131,9 +127,8 @@
       flex-shrink: 0;
     }
     .dot-green  { background: #86BC25; }
-    .dot-blue   { background: #1e3a5f; }
-    .dot-orange { background: #f57c00; }
-    .activity-text { font-size: 13px; color: #444; flex: 1; }
+    .dot-black  { background: #000000; }
+    .activity-text { font-size: 13px; color: #333; flex: 1; }
     .activity-time { font-size: 11px; color: #aaa; }
   </style>
 </head>
@@ -171,22 +166,22 @@
       <!-- STAT CARDS -->
       <div class="dash-section-title">&#128200; Overview</div>
       <div class="stats-row">
-        <div class="stat-card sc-green" data-icon="👥">
+        <div class="stat-card" data-icon="👥">
           <div class="stat-label">Total Employees</div>
           <div class="stat-value" id="statEmployees">—</div>
           <div class="stat-sub">Registered in system</div>
         </div>
-        <div class="stat-card sc-blue" data-icon="📋">
+        <div class="stat-card sc-alt" data-icon="📋">
           <div class="stat-label">Attendance Records</div>
           <div class="stat-value" id="statAttendance">—</div>
           <div class="stat-sub">All time check-ins</div>
         </div>
-        <div class="stat-card sc-orange" data-icon="🌿">
+        <div class="stat-card" data-icon="🌿">
           <div class="stat-label">Leave Requests</div>
           <div class="stat-value" id="statLeaves">—</div>
           <div class="stat-sub">Submitted applications</div>
         </div>
-        <div class="stat-card sc-purple" data-icon="⚙️">
+        <div class="stat-card sc-alt" data-icon="⚙️">
           <div class="stat-label">System Status</div>
           <div class="stat-value" style="font-size:22px; padding-top:4px;">&#128994; Live</div>
           <div class="stat-sub">All services running</div>
@@ -238,12 +233,12 @@
             <span class="activity-time">Live</span>
           </li>
           <li class="activity-item">
-            <span class="activity-dot dot-blue"></span>
+            <span class="activity-dot dot-black"></span>
             <span class="activity-text">JWT authentication is active &amp; secure</span>
             <span class="activity-time">Active</span>
           </li>
           <li class="activity-item">
-            <span class="activity-dot dot-orange"></span>
+            <span class="activity-dot dot-green"></span>
             <span class="activity-text">All HRMS modules: Employees, Attendance, Leaves are operational</span>
             <span class="activity-time">Healthy</span>
           </li>

@@ -102,8 +102,8 @@
           const tr = document.createElement("tr");
           const ci = item.check_in ? new Date(item.check_in).toLocaleTimeString() : "-";
           const co = item.check_out ? new Date(item.check_out).toLocaleTimeString() : "-";
-          const statusColor = item.status === 'Present' ? '#2e7d32' : '#888';
-          tr.innerHTML = `<td>${item.id??""}</td><td>${item.employee??""}</td><td>${item.date??""}</td><td>${ci}</td><td>${co}</td><td style="color:${statusColor};font-weight:600;">${item.status??""}</td>`;
+          const statusColor = item.status === 'Present' ? '#86BC25' : '#000000';
+          tr.innerHTML = `<td>${item.id??""}</td><td>${item.employee??""}</td><td>${item.date??""}</td><td>${ci}</td><td>${co}</td><td style="color:${statusColor};font-weight:700;">${item.status??""}</td>`;
           tbody.appendChild(tr);
         });
       } catch { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Server connection failed</td></tr>"; }

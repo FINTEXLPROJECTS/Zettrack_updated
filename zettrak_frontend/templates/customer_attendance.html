@@ -7,9 +7,8 @@
   <title>ZetTrak - My Attendance</title>
   <link rel="stylesheet" href="{% static 'app.css' %}" />
   <style>
-    .cust-sidebar { background: #1a2a3a; }
-    .status-present { color: #2e7d32; font-weight: 700; }
-    .status-absent  { color: #c62828; font-weight: 700; }
+    .status-present { color: #86BC25; font-weight: 700; }
+    .status-absent  { color: #000000; font-weight: 700; }
   </style>
 </head>
 <body>
@@ -47,20 +46,20 @@
         <h2>&#128203; My Attendance</h2>
         <p>Mark your check-in / check-out and view your records</p>
       </div>
-      <span class="topbar-badge" style="background:#1e3a5f;">&#128100; Employee</span>
+      <span class="topbar-badge">&#128100; Employee</span>
     </header>
 
     <main class="content">
 
       <!-- CHECK IN / OUT -->
-      <div class="form-panel" style="border-top-color:#1e3a5f;">
+      <div class="form-panel">
         <div class="section-title"><span>&#128203;</span> Mark Attendance</div>
-        <p style="font-size:13px; color:#666; margin-bottom:16px;">
-          Your Employee ID: <strong id="displayEmpId" style="color:#1e3a5f;">—</strong>
+        <p style="font-size:13px; color:#555; margin-bottom:16px;">
+          Your Employee ID: <strong id="displayEmpId" style="color:#86BC25;">—</strong>
         </p>
         <input type="hidden" id="employeeId" />
         <div class="btn-row">
-          <button class="btn btn-primary" style="background:#1e3a5f;" onclick="checkIn()">&#9989; Check In</button>
+          <button class="btn btn-primary" onclick="checkIn()">&#9989; Check In</button>
           <button class="btn btn-secondary" onclick="checkOut()">&#128683; Check Out</button>
           <button class="btn btn-secondary" onclick="loadHistory()">&#8635; Refresh</button>
         </div>

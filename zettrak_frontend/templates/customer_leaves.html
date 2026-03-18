@@ -42,16 +42,16 @@
         <h2>&#127807; Apply Leave</h2>
         <p>Submit a new leave request</p>
       </div>
-      <span class="topbar-badge" style="background:#1e3a5f;">&#128100; Employee</span>
+      <span class="topbar-badge">&#128100; Employee</span>
     </header>
 
     <main class="content">
 
-      <div class="form-panel" style="border-top-color:#1e3a5f;">
+      <div class="form-panel">
         <div class="section-title"><span>&#127807;</span> Leave Application Form</div>
-        <p style="font-size:13px; color:#666; margin-bottom:18px;">
-          Applying as: <strong id="empName" style="color:#1e3a5f;">—</strong>
-          &nbsp;|&nbsp; Employee ID: <strong id="empIdDisplay" style="color:#1e3a5f;">—</strong>
+        <p style="font-size:13px; color:#555; margin-bottom:18px;">
+          Applying as: <strong id="empName" style="color:#86BC25;">—</strong>
+          &nbsp;|&nbsp; Employee ID: <strong id="empIdDisplay" style="color:#000000;">—</strong>
         </p>
         <input type="hidden" id="leaveEmployee" />
         <div class="form-grid">
@@ -62,13 +62,13 @@
           <textarea id="reason" placeholder="Reason for leave (explain briefly)..."></textarea>
         </div>
         <div class="btn-row">
-          <button class="btn btn-primary" style="background:#1e3a5f;" onclick="applyLeave()">&#10003; Submit Leave Request</button>
+          <button class="btn btn-primary" onclick="applyLeave()">&#10003; Submit Leave Request</button>
         </div>
         <p id="leaveMsg" class="message"></p>
       </div>
 
       <!-- Leave Types Info -->
-      <div class="form-panel" style="background:#f8fffe; border-top-color:#86BC25; margin-top:0;">
+      <div class="form-panel" style="background:#f8f8f8; margin-top:0;">
         <div class="section-title" style="font-size:14px;"><span>&#128196;</span> Available Leave Types</div>
         <div id="leaveTypesList" style="font-size:13px; color:#555;">Loading leave types...</div>
       </div>
