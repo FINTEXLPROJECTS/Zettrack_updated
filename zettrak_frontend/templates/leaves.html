@@ -51,6 +51,10 @@
   </div>
 
   <script>
+    // ── Admin-only guard ──
+    if (!localStorage.getItem("access") || localStorage.getItem("userType") !== "admin") {
+      window.location.href = "/login-page/";
+    }
     const API_BASE = window.location.origin + "/api/v1/";
     function authHeaders() {
       return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };

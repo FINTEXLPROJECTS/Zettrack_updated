@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - Apply Leave</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+</head>
+<body>
+
+  <!-- EMPLOYEE SIDEBAR — no admin links -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-name">ZetTrak</div>
+      <div class="brand-sub">Employee Portal</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/customer-dashboard/">
+        <span class="nav-icon">&#127968;</span> My Dashboard
+      </a>
+      <a href="/customer-attendance/">
+        <span class="nav-icon">&#128203;</span> My Attendance
+      </a>
+      <a href="/customer-leaves/" class="active">
+        <span class="nav-icon">&#127807;</span> Apply Leave
+      </a>
+      <a href="/customer-leave-history/">
+        <span class="nav-icon">&#128202;</span> My Leave History
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span>&#128682;</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#127807; Apply Leave</h2>
+        <p>Submit a new leave request</p>
+      </div>
+      <span class="topbar-badge" style="background:#1e3a5f;">&#128100; Employee</span>
+    </header>
+
+    <main class="content">
+
+      <div class="form-panel" style="border-top-color:#1e3a5f;">
+        <div class="section-title"><span>&#127807;</span> Leave Application Form</div>
+        <p style="font-size:13px; color:#666; margin-bottom:18px;">
+          Applying as: <strong id="empName" style="color:#1e3a5f;">—</strong>
+          &nbsp;|&nbsp; Employee ID: <strong id="empIdDisplay" style="color:#1e3a5f;">—</strong>
+        </p>
+        <input type="hidden" id="leaveEmployee" />
+        <div class="form-grid">
+          <input type="number" id="leaveType"  placeholder="Leave Type ID" />
+          <div></div>
+          <input type="date"   id="startDate" />
+          <input type="date"   id="endDate" />
+          <textarea id="reason" placeholder="Reason for leave (explain briefly)..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" style="background:#1e3a5f;" onclick="applyLeave()">&#10003; Submit Leave Request</button>
+        </div>
+        <p id="leaveMsg" class="message"></p>
+      </div>
+
+      <!-- Leave Types Info -->
+      <div class="form-panel" style="background:#f8fffe; border-top-color:#86BC25; margin-top:0;">
+        <div class="section-title" style="font-size:14px;"><span>&#128196;</span> Available Leave Types</div>
+        <div id="leaveTypesList" style="font-size:13px; color:#555;">Loading leave types...</div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // ── Security guard: employees only ──
+    if (!localStorage.getItem("access") || localStorage.getItem("userType") !== "customer") {
+      window.location.href = "/login-page/";
+    }
+
+    const API_BASE = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() {
+      localStorage.clear();
+      window.location.href = "/login-page/";
+    }
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("leaveMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
+    }
+
+    // Pre-fill employee data
+    const empData = JSON.parse(localStorage.getItem("employeeData") || "{}");
+    document.getElementById("leaveEmployee").value = empData.id || "";
+    document.getElementById("empIdDisplay").textContent = empData.employee_code || empData.id || "—";
+    document.getElementById("empName").textContent = empData.full_name || localStorage.getItem("username") || "—";
+
+    // Load leave types for reference
+    async function loadLeaveTypes() {
+      try {
+        const res = await fetch(API_BASE + "leaves/types/", { headers: authHeaders() });
+        const data = await res.json();
+        const el = document.getElementById("leaveTypesList");
+        if (!res.ok || !Array.isArray(data) || data.length === 0) {
+          el.textContent = "No leave types configured. Contact your admin."; return;
+        }
+        el.innerHTML = data.map(lt =>
+          `<span style="display:inline-block;margin:4px 8px 4px 0;padding:4px 14px;background:rgba(134,188,37,0.1);border-radius:20px;color:#3a7a00;font-weight:600;">
+            ID ${lt.id}: ${lt.name} (${lt.default_days} days)
+          </span>`
+        ).join("");
+      } catch { document.getElementById("leaveTypesList").textContent = "Could not load leave types."; }
+    }
+
+    async function applyLeave() {
+      const payload = {
+        employee: document.getElementById("leaveEmployee").value,
+        leave_type: document.getElementById("leaveType").value,
+        start_date: document.getElementById("startDate").value,
+        end_date: document.getElementById("endDate").value,
+        reason: document.getElementById("reason").value
+      };
+      if (!payload.employee) { showMsg("Employee data missing. Please login again.", true); return; }
+      if (!payload.leave_type) { showMsg("Please enter a Leave Type ID from the list above.", true); return; }
+      if (!payload.start_date || !payload.end_date) { showMsg("Please select start and end dates.", true); return; }
+      if (payload.start_date > payload.end_date) { showMsg("End date must be after start date.", true); return; }
+      try {
+        const res = await fetch(API_BASE + "leaves/apply/", {
+          method: "POST", headers: authHeaders(), body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) { showMsg("Failed: " + (data.detail || JSON.stringify(data)), true); return; }
+        showMsg("Leave request submitted successfully! Your manager will review it.");
+        document.getElementById("leaveType").value  = "";
+        document.getElementById("startDate").value  = "";
+        document.getElementById("endDate").value    = "";
+        document.getElementById("reason").value     = "";
+      } catch { showMsg("Server connection failed", true); }
+    }
+
+    loadLeaveTypes();
+  </script>
+</body>
+</html>

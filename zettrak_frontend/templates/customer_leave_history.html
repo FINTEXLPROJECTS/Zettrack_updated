@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - My Leave History</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .badge { display:inline-block; padding:3px 10px; border-radius:12px; font-size:12px; font-weight:700; }
+    .badge-pending  { background:#fff3e0; color:#e65100; }
+    .badge-approved { background:#e8f5e9; color:#2e7d32; }
+    .badge-rejected { background:#fce4ec; color:#c62828; }
+  </style>
+</head>
+<body>
+
+  <!-- EMPLOYEE SIDEBAR — no admin links -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-name">ZetTrak</div>
+      <div class="brand-sub">Employee Portal</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/customer-dashboard/">
+        <span class="nav-icon">&#127968;</span> My Dashboard
+      </a>
+      <a href="/customer-attendance/">
+        <span class="nav-icon">&#128203;</span> My Attendance
+      </a>
+      <a href="/customer-leaves/">
+        <span class="nav-icon">&#127807;</span> Apply Leave
+      </a>
+      <a href="/customer-leave-history/" class="active">
+        <span class="nav-icon">&#128202;</span> My Leave History
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="logout()">
+        <span>&#128682;</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#128202; My Leave History</h2>
+        <p>Track status of your leave applications</p>
+      </div>
+      <span class="topbar-badge" style="background:#1e3a5f;">&#128100; Employee</span>
+    </header>
+
+    <main class="content">
+
+      <div class="form-panel" style="border-top-color:#1e3a5f;">
+        <div class="section-title"><span>&#128202;</span> My Leave Applications</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" style="background:#1e3a5f;" onclick="loadHistory()">&#8635; Refresh</button>
+          <a href="/customer-leaves/" class="btn btn-secondary" style="text-decoration:none;">&#43; Apply New Leave</a>
+        </div>
+        <p id="historyMsg" class="message"></p>
+      </div>
+
+      <div class="table-panel">
+        <div class="table-header"><h4>&#128202; Leave Records</h4></div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Leave Type</th><th>Start Date</th><th>End Date</th><th>Reason</th><th>Status</th></tr>
+          </thead>
+          <tbody id="historyTableBody">
+            <tr class="empty-row"><td colspan="6">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // ── Security guard: employees only ──
+    if (!localStorage.getItem("access") || localStorage.getItem("userType") !== "customer") {
+      window.location.href = "/login-page/";
+    }
+
+    const API_BASE = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() {
+      localStorage.clear();
+      window.location.href = "/login-page/";
+    }
+
+    const empData = JSON.parse(localStorage.getItem("employeeData") || "{}");
+    const empId = empData.id || "";
+
+    async function loadHistory() {
+      const tbody = document.getElementById("historyTableBody");
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Loading...</td></tr>";
+      try {
+        const res = await fetch(API_BASE + "leaves/history/", { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Failed to load</td></tr>"; return; }
+
+        // Show only this employee's leave records
+        const myLeaves = empId ? data.filter(r => String(r.employee) === String(empId)) : data;
+
+        if (myLeaves.length === 0) { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>No leave applications found. <a href=\"/customer-leaves/\" style=\"color:#86BC25;\">Apply now</a></td></tr>"; return; }
+        tbody.innerHTML = "";
+        myLeaves.forEach(item => {
+          const tr = document.createElement("tr");
+          const s = item.status || "Pending";
+          const badgeClass = s === "Approved" ? "badge-approved" : s === "Rejected" ? "badge-rejected" : "badge-pending";
+          tr.innerHTML = `
+            <td>${item.id??""}</td>
+            <td>${item.leave_type??""}</td>
+            <td>${item.start_date??""}</td>
+            <td>${item.end_date??""}</td>
+            <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${item.reason??""}">${item.reason||"—"}</td>
+            <td><span class="badge ${badgeClass}">${s}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch { tbody.innerHTML = "<tr class='empty-row'><td colspan='6'>Server connection failed</td></tr>"; }
+    }
+
+    loadHistory();
+  </script>
+</body>
+</html>

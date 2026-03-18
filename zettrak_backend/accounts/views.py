@@ -74,6 +74,20 @@ def leave_balances_page(request):
     return render(request, 'leave_balances.html')
 
 
+# ── Customer-only pages (employee portal) ──
+
+def customer_attendance_page(request):
+    return render(request, 'customer_attendance.html')
+
+
+def customer_leaves_page(request):
+    return render(request, 'customer_leaves.html')
+
+
+def customer_leave_history_page(request):
+    return render(request, 'customer_leave_history.html')
+
+
 # ── Auth API ──
 
 class LoginView(APIView):

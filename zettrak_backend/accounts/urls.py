@@ -4,6 +4,9 @@ from .views import (
     LoginView,
     CustomerLoginView,
     home_page,
+    customer_attendance_page,
+    customer_leaves_page,
+    customer_leave_history_page,
     about_page,
     contact_page,
     login_page,
@@ -48,4 +51,9 @@ urlpatterns = [
     path('companies-page/', companies_page, name='companies_page'),
     path('leave-types-page/', leave_types_page, name='leave_types_page'),
     path('leave-balances-page/', leave_balances_page, name='leave_balances_page'),
+
+    # Customer-only portal pages
+    path('customer-attendance/', customer_attendance_page, name='customer_attendance_page'),
+    path('customer-leaves/', customer_leaves_page, name='customer_leaves_page'),
+    path('customer-leave-history/', customer_leave_history_page, name='customer_leave_history_page'),
 ]

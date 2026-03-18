@@ -262,7 +262,8 @@
     const API = "/api/v1/";
     const token = localStorage.getItem("access");
 
-    if (!token) {
+    // ── Admin-only guard ──
+    if (!token || localStorage.getItem("userType") !== "admin") {
       window.location.href = "/login-page/";
     }
 
