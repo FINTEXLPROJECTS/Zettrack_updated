@@ -1,0 +1,121 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - Designations</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .del-btn { padding:4px 10px; background:#000000; color:#ffffff; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; }
+    .del-btn:hover { background:#333333; }
+  </style>
+</head>
+<body>
+
+  {% with active_page='designations' %}{% include '_sidebar.html' %}{% endwith %}
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#127959; Designations</h2>
+        <p>Manage job designations within departments</p>
+      </div>
+      <span class="topbar-badge">&#9881; Admin</span>
+    </header>
+
+    <main class="content">
+
+      <div class="form-panel">
+        <div class="section-title"><span>&#43;</span> Add New Designation</div>
+        <div class="form-grid">
+          <input type="number" id="des_dept"  placeholder="Department ID *" />
+          <input type="text"   id="des_name"  placeholder="Designation Name *" />
+          <textarea           id="des_desc"  placeholder="Description (optional)"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="addDesignation()">&#43; Add Designation</button>
+          <button class="btn btn-secondary" onclick="loadDesignations()">&#8635; Refresh</button>
+        </div>
+        <p id="desMsg" class="message"></p>
+      </div>
+
+      <div class="table-panel">
+        <div class="table-header"><h4>&#127959; All Designations</h4></div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Department ID</th><th>Description</th><th>Action</th></tr>
+          </thead>
+          <tbody id="desTableBody">
+            <tr class="empty-row"><td colspan="5">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    if (!localStorage.getItem("access") || localStorage.getItem("userType") !== "admin") {
+      window.location.href = "/login-page/";
+    }
+    const API = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() { localStorage.clear(); window.location.href = "/login-page/"; }
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("desMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
+    }
+
+    async function addDesignation() {
+      const payload = {
+        department: document.getElementById("des_dept").value,
+        name: document.getElementById("des_name").value.trim(),
+        description: document.getElementById("des_desc").value,
+      };
+      if (!payload.department || !payload.name) { showMsg("Department ID and Designation name are required", true); return; }
+      try {
+        const res = await fetch(API + "employees/designations/", { method: "POST", headers: authHeaders(), body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) { showMsg("Failed: " + JSON.stringify(data), true); return; }
+        showMsg("Designation added successfully");
+        document.getElementById("des_dept").value = "";
+        document.getElementById("des_name").value = "";
+        document.getElementById("des_desc").value = "";
+        loadDesignations();
+      } catch { showMsg("Server connection failed", true); }
+    }
+
+    async function deleteDesignation(id, name) {
+      if (!confirm("Delete designation '" + name + "'?")) return;
+      try {
+        const res = await fetch(API + "employees/designations/" + id + "/", { method: "DELETE", headers: authHeaders() });
+        if (res.status === 204 || res.ok) { showMsg("Designation deleted"); loadDesignations(); }
+        else showMsg("Failed to delete", true);
+      } catch { showMsg("Server error", true); }
+    }
+
+    async function loadDesignations() {
+      const tbody = document.getElementById("desTableBody");
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='5'>Loading...</td></tr>";
+      try {
+        const res = await fetch(API + "employees/designations/", { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { tbody.innerHTML = "<tr class='empty-row'><td colspan='5'>Failed to load</td></tr>"; return; }
+        if (data.length === 0) { tbody.innerHTML = "<tr class='empty-row'><td colspan='5'>No designations found. Add one above.</td></tr>"; return; }
+        tbody.innerHTML = "";
+        data.forEach(d => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${d.id??""}</td><td><strong>${d.name??""}</strong></td><td>${d.department??""}</td><td>${d.description??"-"}</td><td><button class="del-btn" onclick="deleteDesignation(${d.id},'${(d.name||"").replace(/'/g,"\\'")}')">&#128465; Delete</button></td>`;
+          tbody.appendChild(tr);
+        });
+      } catch { tbody.innerHTML = "<tr class='empty-row'><td colspan='5'>Server connection failed</td></tr>"; }
+    }
+
+    loadDesignations();
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - My Profile</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .profile-card { background:#fff; border-radius:16px; padding:32px; box-shadow:0 2px 16px rgba(0,0,0,0.07); border-top:4px solid #86BC25; max-width:600px; }
+    .profile-avatar { width:72px; height:72px; border-radius:50%; background:#86BC25; display:flex; align-items:center; justify-content:center; font-size:32px; color:#fff; font-weight:700; margin-bottom:20px; }
+    .profile-name { font-size:22px; font-weight:800; color:#000; margin-bottom:4px; }
+    .profile-role { font-size:13px; color:#86BC25; font-weight:600; margin-bottom:24px; }
+    .profile-divider { border:none; border-top:2px solid #f0f0f0; margin:20px 0; }
+    .profile-field { margin-bottom:16px; }
+    .profile-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#aaa; margin-bottom:4px; }
+    .profile-value { font-size:14px; color:#333; font-weight:500; }
+    .edit-input { width:100%; padding:10px 14px; border:2px solid #e0e0e0; border-radius:8px; font-size:14px; margin-top:4px; box-sizing:border-box; }
+    .edit-input:focus { outline:none; border-color:#86BC25; }
+  </style>
+</head>
+<body>
+
+  {% with active_page='profile' %}{% include '_sidebar.html' %}{% endwith %}
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#128100; My Profile</h2>
+        <p>View and update your account details</p>
+      </div>
+      <span class="topbar-badge">&#9881; Admin</span>
+    </header>
+
+    <main class="content">
+
+      <div class="profile-card">
+        <div class="profile-avatar" id="profileAvatar">?</div>
+        <div class="profile-name" id="profileName">Loading...</div>
+        <div class="profile-role" id="profileRole">—</div>
+
+        <hr class="profile-divider" />
+
+        <div class="form-grid">
+          <div class="profile-field">
+            <div class="profile-label">Username</div>
+            <input class="edit-input" id="p_username" placeholder="Username" />
+          </div>
+          <div class="profile-field">
+            <div class="profile-label">Email</div>
+            <input class="edit-input" id="p_email" type="email" placeholder="Email" />
+          </div>
+          <div class="profile-field">
+            <div class="profile-label">First Name</div>
+            <input class="edit-input" id="p_first_name" placeholder="First Name" />
+          </div>
+          <div class="profile-field">
+            <div class="profile-label">Last Name</div>
+            <input class="edit-input" id="p_last_name" placeholder="Last Name" />
+          </div>
+          <div class="profile-field">
+            <div class="profile-label">Phone</div>
+            <input class="edit-input" id="p_phone" placeholder="Phone" />
+          </div>
+          <div class="profile-field">
+            <div class="profile-label">New Password (leave blank to keep current)</div>
+            <input class="edit-input" id="p_password" type="password" placeholder="New password" />
+          </div>
+        </div>
+
+        <div class="btn-row" style="margin-top:20px;">
+          <button class="btn btn-primary" onclick="updateProfile()">&#10003; Save Changes</button>
+        </div>
+        <p id="profileMsg" class="message"></p>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    if (!localStorage.getItem("access") || localStorage.getItem("userType") !== "admin") {
+      window.location.href = "/login-page/";
+    }
+    const API = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() { localStorage.clear(); window.location.href = "/login-page/"; }
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("profileMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
+    }
+
+    async function loadProfile() {
+      try {
+        const res = await fetch(API + "accounts/me/", { headers: authHeaders() });
+        const u = await res.json();
+        if (!res.ok) return;
+
+        document.getElementById("profileAvatar").textContent = (u.username || "?")[0].toUpperCase();
+        document.getElementById("profileName").textContent = (u.first_name || "") + " " + (u.last_name || "") || u.username;
+        document.getElementById("profileRole").textContent = u.is_staff ? "Administrator" : "User";
+
+        document.getElementById("p_username").value   = u.username || "";
+        document.getElementById("p_email").value      = u.email || "";
+        document.getElementById("p_first_name").value = u.first_name || "";
+        document.getElementById("p_last_name").value  = u.last_name || "";
+        document.getElementById("p_phone").value      = u.phone || "";
+      } catch { showMsg("Failed to load profile", true); }
+    }
+
+    async function updateProfile() {
+      const payload = {
+        username:   document.getElementById("p_username").value,
+        email:      document.getElementById("p_email").value,
+        first_name: document.getElementById("p_first_name").value,
+        last_name:  document.getElementById("p_last_name").value,
+        phone:      document.getElementById("p_phone").value,
+      };
+      const pw = document.getElementById("p_password").value;
+      if (pw) payload.password = pw;
+
+      try {
+        const res = await fetch(API + "accounts/me/", { method: "PATCH", headers: authHeaders(), body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) { showMsg("Failed: " + JSON.stringify(data), true); return; }
+        showMsg("Profile updated successfully");
+        document.getElementById("p_password").value = "";
+        loadProfile();
+      } catch { showMsg("Server connection failed", true); }
+    }
+
+    loadProfile();
+  </script>
+</body>
+</html>

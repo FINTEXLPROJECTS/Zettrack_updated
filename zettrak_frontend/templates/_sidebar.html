@@ -16,8 +16,14 @@
     <a href="/companies-page/" {% if active_page == 'companies' %}class="active"{% endif %}>
       <span class="nav-icon">&#127963;</span> Companies
     </a>
+    <a href="/departments-page/" {% if active_page == 'departments' %}class="active"{% endif %}>
+      <span class="nav-icon">&#127963;</span> Departments
+    </a>
+    <a href="/designations-page/" {% if active_page == 'designations' %}class="active"{% endif %}>
+      <span class="nav-icon">&#127959;</span> Designations
+    </a>
     <a href="/roles-page/" {% if active_page == 'roles' %}class="active"{% endif %}>
-      <span class="nav-icon">&#127959;</span> Roles
+      <span class="nav-icon">&#128274;</span> Roles
     </a>
     <a href="/users-page/" {% if active_page == 'users' %}class="active"{% endif %}>
       <span class="nav-icon">&#128100;</span> Users
@@ -31,7 +37,7 @@
       <span class="nav-icon">&#128203;</span> Attendance
     </a>
 
-    <span class="nav-section-label">Leave Management</span>
+    <span class="nav-section-label">Leave</span>
     <a href="/leaves-page/" {% if active_page == 'leaves' %}class="active"{% endif %}>
       <span class="nav-icon">&#127807;</span> Apply Leave
     </a>
@@ -45,9 +51,20 @@
       <span class="nav-icon">&#9878;</span> Leave Balances
     </a>
 
-    <span class="nav-section-label">System</span>
-    <a href="/admin/" target="_blank">
-      <span class="nav-icon">&#9881;</span> Django Admin
+    <span class="nav-section-label">Finance</span>
+    <a href="/payroll-page/" {% if active_page == 'payroll' %}class="active"{% endif %}>
+      <span class="nav-icon">&#128181;</span> Payroll
+    </a>
+
+    <span class="nav-section-label">More</span>
+    <a href="/reports-page/" {% if active_page == 'reports' %}class="active"{% endif %}>
+      <span class="nav-icon">&#128202;</span> Reports
+    </a>
+    <a href="/notifications-page/" {% if active_page == 'notifications' %}class="active"{% endif %}>
+      <span class="nav-icon">&#128276;</span> Notifications
+    </a>
+    <a href="/profile-page/" {% if active_page == 'profile' %}class="active"{% endif %}>
+      <span class="nav-icon">&#128100;</span> My Profile
     </a>
 
   </nav>
@@ -58,3 +75,13 @@
     </button>
   </div>
 </aside>
+
+<script>
+  (function() {
+    const un = localStorage.getItem("username");
+    if (un) {
+      const el = document.getElementById("sidebarBrand");
+      if (el) el.textContent = un.toUpperCase();
+    }
+  })();
+</script>

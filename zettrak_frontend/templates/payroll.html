@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - Payroll</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .badge-paid    { display:inline-block; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:700; background:rgba(134,188,37,0.12); color:#86BC25; border:1px solid rgba(134,188,37,0.3); }
+    .badge-pending { display:inline-block; padding:2px 10px; border-radius:10px; font-size:11px; font-weight:700; background:#f5f5f5; color:#000; border:1px solid #ccc; }
+    .pay-btn { padding:4px 10px; background:#86BC25; color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; }
+    .pay-btn:hover { background:#6fa01e; }
+    .del-btn { padding:4px 10px; background:#000; color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; margin-left:4px; }
+    .del-btn:hover { background:#333; }
+  </style>
+</head>
+<body>
+
+  {% with active_page='payroll' %}{% include '_sidebar.html' %}{% endwith %}
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#128181; Payroll</h2>
+        <p>Manage employee salary and payroll records</p>
+      </div>
+      <span class="topbar-badge">&#9881; Admin</span>
+    </header>
+
+    <main class="content">
+
+      <div class="form-panel">
+        <div class="section-title"><span>&#43;</span> Add Payroll Record</div>
+        <div class="form-grid">
+          <input type="number" id="p_employee"     placeholder="Employee ID *" />
+          <input type="number" id="p_month"        placeholder="Month (1-12) *" min="1" max="12" />
+          <input type="number" id="p_year"         placeholder="Year (e.g. 2025) *" />
+          <input type="number" id="p_basic"        placeholder="Basic Salary *" step="0.01" />
+          <input type="number" id="p_deductions"   placeholder="Deductions" step="0.01" value="0" />
+          <input type="number" id="p_net"          placeholder="Net Salary *" step="0.01" />
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="addPayroll()">&#43; Add Record</button>
+          <button class="btn btn-secondary" onclick="loadPayroll()">&#8635; Refresh</button>
+        </div>
+        <p id="payrollMsg" class="message"></p>
+      </div>
+
+      <div class="table-panel">
+        <div class="table-header"><h4>&#128181; All Payroll Records</h4></div>
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Employee</th><th>Month/Year</th><th>Basic</th><th>Deductions</th><th>Net Salary</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="payrollTableBody">
+            <tr class="empty-row"><td colspan="8">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    if (!localStorage.getItem("access") || localStorage.getItem("userType") !== "admin") {
+      window.location.href = "/login-page/";
+    }
+    const API = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() { localStorage.clear(); window.location.href = "/login-page/"; }
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("payrollMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
+    }
+
+    async function addPayroll() {
+      const payload = {
+        employee: document.getElementById("p_employee").value,
+        month: document.getElementById("p_month").value,
+        year: document.getElementById("p_year").value,
+        basic_salary: document.getElementById("p_basic").value,
+        deductions: document.getElementById("p_deductions").value || 0,
+        net_salary: document.getElementById("p_net").value,
+        status: "Pending"
+      };
+      if (!payload.employee || !payload.month || !payload.year || !payload.basic_salary || !payload.net_salary) {
+        showMsg("Employee ID, Month, Year, Basic Salary and Net Salary are required", true); return;
+      }
+      try {
+        const res = await fetch(API + "payroll/", { method: "POST", headers: authHeaders(), body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (!res.ok) { showMsg("Failed: " + JSON.stringify(data), true); return; }
+        showMsg("Payroll record added successfully");
+        loadPayroll();
+      } catch { showMsg("Server connection failed", true); }
+    }
+
+    async function markPaid(id) {
+      try {
+        const res = await fetch(API + "payroll/" + id + "/mark-paid/", { method: "POST", headers: authHeaders() });
+        const data = await res.json();
+        showMsg(res.ok ? "Marked as Paid" : (data.error || "Failed"), !res.ok);
+        if (res.ok) loadPayroll();
+      } catch { showMsg("Server error", true); }
+    }
+
+    async function deletePayroll(id) {
+      if (!confirm("Delete payroll record #" + id + "?")) return;
+      try {
+        const res = await fetch(API + "payroll/" + id + "/", { method: "DELETE", headers: authHeaders() });
+        if (res.status === 204 || res.ok) { showMsg("Record deleted"); loadPayroll(); }
+        else showMsg("Failed to delete", true);
+      } catch { showMsg("Server error", true); }
+    }
+
+    async function loadPayroll() {
+      const tbody = document.getElementById("payrollTableBody");
+      tbody.innerHTML = "<tr class='empty-row'><td colspan='8'>Loading...</td></tr>";
+      try {
+        const res = await fetch(API + "payroll/", { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { tbody.innerHTML = "<tr class='empty-row'><td colspan='8'>Failed to load</td></tr>"; return; }
+        if (data.length === 0) { tbody.innerHTML = "<tr class='empty-row'><td colspan='8'>No payroll records found. Add one above.</td></tr>"; return; }
+        tbody.innerHTML = "";
+        data.forEach(p => {
+          const badge = p.status === "Paid"
+            ? '<span class="badge-paid">Paid</span>'
+            : '<span class="badge-pending">Pending</span>';
+          const actions = p.status === "Pending"
+            ? `<button class="pay-btn" onclick="markPaid(${p.id})">&#10003; Mark Paid</button><button class="del-btn" onclick="deletePayroll(${p.id})">&#128465;</button>`
+            : `<button class="del-btn" onclick="deletePayroll(${p.id})">&#128465;</button>`;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${p.id??""}</td><td>${p.employee??""}</td><td>${p.month??""} / ${p.year??""}</td><td>&#8377;${p.basic_salary??0}</td><td>&#8377;${p.deductions??0}</td><td><strong>&#8377;${p.net_salary??0}</strong></td><td>${badge}</td><td>${actions}</td>`;
+          tbody.appendChild(tr);
+        });
+      } catch { tbody.innerHTML = "<tr class='empty-row'><td colspan='8'>Server connection failed</td></tr>"; }
+    }
+
+    loadPayroll();
+  </script>
+</body>
+</html>
