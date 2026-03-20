@@ -309,6 +309,14 @@ body {
   gap: 24px;
 }
 
+.features-grid-2col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 768px) {
+  .features-grid-2col { grid-template-columns: 1fr; }
+}
+
 .feature-card {
   background: #ffffff;
   border-radius: 14px;
