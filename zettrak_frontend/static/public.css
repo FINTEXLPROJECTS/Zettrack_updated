@@ -534,8 +534,12 @@ body {
 
 .values-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 22px;
+}
+
+@media (max-width: 768px) {
+  .values-grid { grid-template-columns: 1fr; }
 }
 
 .value-card {
