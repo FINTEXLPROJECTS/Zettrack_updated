@@ -312,6 +312,7 @@ body {
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
   border-top: 4px solid #86BC25;
   transition: box-shadow 0.25s, transform 0.25s;
+  text-align: center;
 }
 
 .feature-card:hover {
