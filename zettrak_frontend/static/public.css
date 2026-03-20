@@ -519,6 +519,12 @@ body {
   padding: 40px;
   text-align: center;
   border: 1px solid rgba(134, 188, 37, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.about-visual:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(134, 188, 37, 0.18);
 }
 
 .about-visual .big-icon {
