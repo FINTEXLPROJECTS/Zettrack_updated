@@ -940,11 +940,7 @@ body {
 .pub-footer-bottom {
   padding-top: 24px;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  text-align: center;
 }
 
 .pub-footer-bottom p {
