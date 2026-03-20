@@ -125,9 +125,9 @@ body {
 
 .hero-badge {
   display: inline-block;
-  background: rgba(134, 188, 37, 0.15);
-  color: #86BC25;
-  border: 1px solid rgba(134, 188, 37, 0.35);
+  background: #86BC25;
+  color: #000000;
+  border: 1px solid #86BC25;
   padding: 6px 18px;
   border-radius: 20px;
   font-size: 12px;
