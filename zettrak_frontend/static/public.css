@@ -881,7 +881,7 @@ body {
    FOOTER
 ═══════════════════════════ */
 .pub-footer {
-  background: #f5f5f5;
+  background: #000000;
   padding: 48px 28px 28px;
   border-top: 3px solid #86BC25;
 }
@@ -910,7 +910,7 @@ body {
 
 .pub-footer-brand p {
   font-size: 13px;
-  color: #444444;
+  color: rgba(255, 255, 255, 0.65);
   max-width: 260px;
   line-height: 1.6;
 }
@@ -926,7 +926,7 @@ body {
 
 .pub-footer-links a {
   display: block;
-  color: #333333;
+  color: rgba(255, 255, 255, 0.65);
   text-decoration: none;
   font-size: 14px;
   margin-bottom: 9px;
@@ -939,13 +939,13 @@ body {
 
 .pub-footer-bottom {
   padding-top: 24px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
 }
 
 .pub-footer-bottom p {
   font-size: 13px;
-  color: #555555;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .pub-footer-bottom span {
