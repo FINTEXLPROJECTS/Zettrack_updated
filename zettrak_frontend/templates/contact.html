@@ -10,7 +10,7 @@
 <body>
 
   <!-- NAVBAR -->
-  <nav class="pub-navbar">
+  <nav class="pub-navbar" id="pub-navbar">
     <div class="pub-navbar-inner">
       <a href="/" class="pub-brand">
         <span class="pub-brand-icon">&#128188;</span>
@@ -25,8 +25,23 @@
         <a href="/contact/" class="active">Contact</a>
         <a href="/login-page/" class="pub-nav-login">&#128274; Login</a>
       </div>
+      <button class="pub-nav-hamburger" onclick="toggleMobileNav()" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="pub-mobile-nav" id="pub-mobile-nav">
+      <a href="/">Home</a>
+      <a href="/about/">About</a>
+      <a href="/contact/" class="active">Contact</a>
+      <a href="/login-page/" class="pub-nav-login">&#128274; Login</a>
     </div>
   </nav>
+  <script>
+    function toggleMobileNav() {
+      var nav = document.getElementById('pub-mobile-nav');
+      nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+    }
+  </script>
 
   <!-- CONTACT HERO -->
   <section class="contact-hero">
