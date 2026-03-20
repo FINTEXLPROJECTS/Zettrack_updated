@@ -168,7 +168,7 @@ body {
 }
 
 .btn-hero-primary {
-  background: #86BC25;
+  background: #000000;
   color: #ffffff;
   padding: 15px 36px;
   border-radius: 10px;
@@ -182,8 +182,8 @@ body {
 }
 
 .btn-hero-primary:hover {
-  background: #6fa01e;
-  box-shadow: 0 6px 24px rgba(134, 188, 37, 0.4);
+  background: #222222;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
 }
 
 .btn-hero-secondary {
