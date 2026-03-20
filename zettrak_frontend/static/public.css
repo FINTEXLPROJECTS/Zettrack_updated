@@ -491,10 +491,113 @@ body {
   margin-bottom: 56px;
 }
 
+/* ═══════════════════════════
+   MOBILE NAV HAMBURGER
+═══════════════════════════ */
+.pub-nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.pub-nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+.pub-mobile-nav {
+  display: none;
+  flex-direction: column;
+  background: #000000;
+  padding: 12px 16px 20px;
+  border-top: 1px solid rgba(134, 188, 37, 0.2);
+}
+
+.pub-mobile-nav a {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  padding: 12px 8px;
+  font-size: 15px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: color 0.2s;
+}
+
+.pub-mobile-nav a:last-child {
+  border-bottom: none;
+}
+
+.pub-mobile-nav a:hover,
+.pub-mobile-nav a.active {
+  color: #86BC25;
+}
+
+.pub-mobile-nav .pub-nav-login {
+  background: #86BC25;
+  color: #ffffff !important;
+  border-radius: 8px;
+  padding: 11px 16px;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 700;
+  border-bottom: none;
+}
+
 @media (max-width: 768px) {
   .about-grid { grid-template-columns: 1fr; }
-  .hero h1 { font-size: 34px; }
-  .section-title { font-size: 26px; }
+  .hero h1 { font-size: 32px; }
+  .section-title { font-size: 24px; }
+
+  /* Navbar */
+  .pub-nav-links { display: none; }
+  .pub-nav-hamburger { display: flex; }
+
+  /* Hero */
+  .hero { padding: 60px 20px 56px; }
+  .hero p { font-size: 15px; }
+  .hero-stats { gap: 24px; margin-top: 40px; }
+  .hero-stat .stat-number { font-size: 24px; }
+
+  /* Sections */
+  .section { padding: 56px 20px; }
+  .section-subtitle { font-size: 14px; }
+
+  /* Features grid */
+  .features-grid { grid-template-columns: 1fr; }
+  .features-grid-2col { grid-template-columns: 1fr; }
+
+  /* Steps */
+  .steps-grid { grid-template-columns: 1fr 1fr; }
+
+  /* About */
+  .about-hero { padding: 52px 20px; }
+  .about-hero h1 { font-size: 32px; }
+
+  /* Contact */
+  .contact-hero { padding: 52px 20px; }
+  .contact-hero h1 { font-size: 32px; }
+  .contact-layout { grid-template-columns: 1fr; }
+
+  /* Footer */
+  .pub-footer-top { flex-direction: column; gap: 24px; }
+  .pub-footer-bottom { flex-direction: column; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 26px; }
+  .hero-btns { flex-direction: column; align-items: center; }
+  .btn-hero-primary, .btn-hero-secondary { width: 100%; justify-content: center; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .hero-stats { gap: 20px; }
+  .form-row-2 { grid-template-columns: 1fr; }
 }
 
 .about-text h2 {
