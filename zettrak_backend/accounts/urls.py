@@ -9,6 +9,7 @@ from .views import (
     customer_leave_history_page,
     about_page,
     contact_page,
+    pricing_page,
     login_page,
     dashboard_page,
     employees_page,
@@ -33,6 +34,7 @@ urlpatterns = [
     path('', home_page, name='home_page'),
     path('about/', about_page, name='about_page'),
     path('contact/', contact_page, name='contact_page'),
+    path('pricing/', pricing_page, name='pricing_page'),
 
     # Auth page
     path('login-page/', login_page, name='login_page'),

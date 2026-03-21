@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing - ZetTrak HRMS | Free & Pro Plans</title>
+  <meta name="description" content="ZetTrak HRMS is free for teams up to 20 employees. For larger teams, upgrade to our Pro plan for unlimited employees and advanced features." />
+  <meta name="keywords" content="ZetTrak pricing, HRMS free plan, HR software pricing, workforce management cost, free HRMS" />
+  <meta name="author" content="ZetTrak HRMS" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://yourdomain.com/pricing/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Pricing - ZetTrak HRMS | Free & Pro Plans" />
+  <meta property="og:description" content="ZetTrak HRMS is free for teams up to 20 employees. Upgrade to Pro for larger teams." />
+  <meta property="og:url" content="https://yourdomain.com/pricing/" />
+  <meta property="og:site_name" content="ZetTrak HRMS" />
+  <meta property="og:image" content="https://yourdomain.com/static/og-image.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Pricing - ZetTrak HRMS" />
+  <meta name="twitter:description" content="Free for up to 20 employees. Pro plan for growing teams." />
+  <meta name="twitter:image" content="https://yourdomain.com/static/og-image.png" />
+
+  <link rel="stylesheet" href="{% static 'public.css' %}" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "ZetTrak Pricing",
+    "url": "https://yourdomain.com/pricing/",
+    "description": "ZetTrak HRMS pricing plans — Free for up to 20 employees, Pro for larger teams."
+  }
+  </script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="pub-navbar" id="pub-navbar">
+    <div class="pub-navbar-inner">
+      <a href="/" class="pub-brand">
+        <span class="pub-brand-icon">&#128188;</span>
+        <div>
+          <span class="pub-brand-name">ZetTrak</span>
+          <span class="pub-brand-tag">HRMS</span>
+        </div>
+      </a>
+      <div class="pub-nav-links">
+        <a href="/">Home</a>
+        <a href="/about/">About</a>
+        <a href="/pricing/" class="active">Pricing</a>
+        <a href="/contact/">Contact</a>
+        <a href="/login-page/" class="pub-nav-login">&#128274; Login</a>
+      </div>
+      <button class="pub-nav-hamburger" onclick="toggleMobileNav()" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="pub-mobile-nav" id="pub-mobile-nav">
+      <a href="/">Home</a>
+      <a href="/about/">About</a>
+      <a href="/pricing/" class="active">Pricing</a>
+      <a href="/contact/">Contact</a>
+      <a href="/login-page/" class="pub-nav-login">&#128274; Login</a>
+    </div>
+  </nav>
+  <script>
+    function toggleMobileNav() {
+      var nav = document.getElementById('pub-mobile-nav');
+      nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
+    }
+  </script>
+
+  <!-- PRICING HERO -->
+  <section class="pricing-hero">
+    <h1>Simple, <span>Transparent</span> Pricing</h1>
+    <p>Start free — no credit card required. Scale up only when your team grows beyond 20 employees.</p>
+  </section>
+
+  <!-- PRICING CARDS -->
+  <section class="section section-white">
+    <div class="section-inner">
+      <div class="pricing-grid">
+
+        <!-- FREE PLAN -->
+        <div class="pricing-card">
+          <div class="pricing-badge free-badge">Most Popular</div>
+          <div class="pricing-icon">🆓</div>
+          <h2 class="pricing-plan-name">Free</h2>
+          <div class="pricing-price">
+            <span class="price-amount">₹0</span>
+            <span class="price-period">/ forever</span>
+          </div>
+          <p class="pricing-tagline">Perfect for small teams getting started with HR management.</p>
+          <div class="pricing-limit">
+            <span class="limit-number">Up to 20</span>
+            <span class="limit-label">Employees</span>
+          </div>
+          <ul class="pricing-features">
+            <li>✅ Employee Records Management</li>
+            <li>✅ Attendance Tracking</li>
+            <li>✅ Leave Application & Approval</li>
+            <li>✅ Leave Balance Management</li>
+            <li>✅ Role &amp; Company Setup</li>
+            <li>✅ Admin Dashboard</li>
+            <li>✅ Employee Self-Service Portal</li>
+            <li>✅ JWT Secure Authentication</li>
+            <li class="feature-na">❌ Priority Support</li>
+            <li class="feature-na">❌ Advanced Reports</li>
+            <li class="feature-na">❌ API Access</li>
+          </ul>
+          <a href="/login-page/" class="pricing-btn pricing-btn-free">Get Started Free</a>
+        </div>
+
+        <!-- PRO PLAN -->
+        <div class="pricing-card pricing-card-pro">
+          <div class="pricing-badge pro-badge">For Growing Teams</div>
+          <div class="pricing-icon">⚡</div>
+          <h2 class="pricing-plan-name">Pro</h2>
+          <div class="pricing-price">
+            <span class="price-amount">Custom</span>
+            <span class="price-period">/ month</span>
+          </div>
+          <p class="pricing-tagline">Built for organisations with more than 20 employees and advanced needs.</p>
+          <div class="pricing-limit">
+            <span class="limit-number">21+</span>
+            <span class="limit-label">Employees</span>
+          </div>
+          <ul class="pricing-features">
+            <li>✅ Everything in Free</li>
+            <li>✅ Unlimited Employees</li>
+            <li>✅ Priority Email &amp; Phone Support</li>
+            <li>✅ Advanced Attendance Reports</li>
+            <li>✅ Payroll Integration (coming soon)</li>
+            <li>✅ Custom Leave Policies</li>
+            <li>✅ Multi-Branch Support</li>
+            <li>✅ REST API Access</li>
+            <li>✅ Dedicated Account Manager</li>
+            <li>✅ Data Export (CSV / Excel)</li>
+            <li>✅ SLA Guarantee</li>
+          </ul>
+          <a href="/contact/" class="pricing-btn pricing-btn-pro">Contact Sales</a>
+        </div>
+
+      </div>
+
+      <!-- COMPARISON NOTE -->
+      <div class="pricing-note">
+        <p>🔒 All plans include <strong>secure JWT authentication</strong>, <strong>cloud-ready deployment</strong>, and <strong>full data ownership</strong>. No hidden fees.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section section-light">
+    <div class="section-inner">
+      <div class="section-heading">
+        <h2>Frequently Asked <span>Questions</span></h2>
+        <p>Everything you need to know about ZetTrak pricing.</p>
+      </div>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h4>🤔 What counts as an employee?</h4>
+          <p>Any active employee record added in the system counts. Deactivated or deleted employees do not count towards your limit.</p>
+        </div>
+        <div class="faq-item">
+          <h4>💳 Do I need a credit card for the free plan?</h4>
+          <p>No. The free plan is completely free forever — no credit card, no trial period, no surprises.</p>
+        </div>
+        <div class="faq-item">
+          <h4>📈 What happens if I exceed 20 employees?</h4>
+          <p>You will be prompted to upgrade to the Pro plan. Your existing data is safe and you can contact us to discuss pricing for your team size.</p>
+        </div>
+        <div class="faq-item">
+          <h4>🔄 Can I switch plans anytime?</h4>
+          <p>Yes. You can upgrade from Free to Pro at any time. All your data migrates seamlessly — no downtime required.</p>
+        </div>
+        <div class="faq-item">
+          <h4>🏢 Is there a discount for NGOs or educational institutions?</h4>
+          <p>Yes. We offer special pricing for non-profit organisations and educational institutions. Contact us to learn more.</p>
+        </div>
+        <div class="faq-item">
+          <h4>📞 What support is included in the Free plan?</h4>
+          <p>Free plan users have access to our documentation and community support. Pro plan users get priority email and phone support with an SLA.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-banner">
+    <h2>Ready to <span style="color:#000000;font-weight:800;">Start for Free?</span></h2>
+    <p>Join teams already managing their workforce smarter with ZetTrak HRMS.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <a href="/login-page/" class="btn-cta">&#128274; Get Started Free</a>
+      <a href="/contact/" class="btn-cta-outline">&#128222; Talk to Sales</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="pub-footer">
+    <div class="pub-footer-inner">
+      <div class="pub-footer-top">
+        <div class="pub-footer-brand">
+          <div class="brand-name">ZetTrak</div>
+          <p>A modern Human Resource Management System for efficient and smart workforce management.</p>
+        </div>
+        <div class="pub-footer-links">
+          <h4>Navigation</h4>
+          <a href="/">Home</a>
+          <a href="/about/">About</a>
+          <a href="/pricing/">Pricing</a>
+          <a href="/contact/">Contact</a>
+          <a href="/login-page/">Login</a>
+        </div>
+        <div class="pub-footer-links">
+          <h4>System</h4>
+          <a href="/dashboard/">Dashboard</a>
+          <a href="/employees-page/">Employees</a>
+          <a href="/attendance-page/">Attendance</a>
+          <a href="/leaves-page/">Leaves</a>
+        </div>
+      </div>
+      <div class="pub-footer-bottom">
+        <p>&copy; 2023 <span>FINTEXL</span>. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
