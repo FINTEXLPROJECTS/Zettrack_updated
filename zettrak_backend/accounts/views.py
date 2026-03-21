@@ -78,6 +78,30 @@ def leave_balances_page(request):
     return render(request, 'leave_balances.html')
 
 
+def departments_page(request):
+    return render(request, 'departments.html')
+
+
+def designations_page(request):
+    return render(request, 'designations.html')
+
+
+def payroll_page(request):
+    return render(request, 'payroll.html')
+
+
+def notifications_page(request):
+    return render(request, 'notifications.html')
+
+
+def reports_page(request):
+    return render(request, 'reports.html')
+
+
+def profile_page(request):
+    return render(request, 'profile.html')
+
+
 # ── Customer-only pages (employee portal) ──
 
 def customer_attendance_page(request):
@@ -214,3 +238,17 @@ class RoleListCreateView(generics.ListCreateAPIView):
 class RoleDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Role.objects.all()
     serializer_class = RoleSerializer
+
+
+# ── My Profile API ──
+
+class MyProfileView(APIView):
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+    def patch(self, request):
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)

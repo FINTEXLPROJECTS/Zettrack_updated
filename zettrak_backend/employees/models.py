@@ -3,6 +3,24 @@ from accounts.models import User
 from companies.models import Company
 
 
+class Department(models.Model):
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='departments')
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Designation(models.Model):
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='designations')
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Employee(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='employees')
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='employee_profile')

@@ -68,14 +68,27 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('api/v1/auth/', include('accounts.urls')),
 
-    # New: Users & Roles API
+    # Users & Roles API
     path('api/v1/accounts/', include('accounts.api_urls')),
 
-    # Existing API routes (unchanged)
+    # Employees, Departments, Designations API
     path('api/v1/employees/', include('employees.urls')),
+
+    # Attendance API
     path('api/v1/attendance/', include('attendance.urls')),
+
+    # Leaves API
     path('api/v1/leaves/', include('leave_management.urls')),
 
-    # New: Companies API
+    # Companies API
     path('api/v1/companies/', include('companies.urls')),
+
+    # Payroll API
+    path('api/v1/payroll/', include('payroll.urls')),
+
+    # Notifications API
+    path('api/v1/notifications/', include('notifications.urls')),
+
+    # Reports API
+    path('api/v1/reports/', include('reports.urls')),
 ]

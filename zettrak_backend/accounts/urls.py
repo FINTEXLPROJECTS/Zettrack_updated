@@ -22,6 +22,12 @@ from .views import (
     companies_page,
     leave_types_page,
     leave_balances_page,
+    departments_page,
+    designations_page,
+    payroll_page,
+    notifications_page,
+    reports_page,
+    profile_page,
 )
 
 urlpatterns = [
@@ -53,6 +59,12 @@ urlpatterns = [
     path('companies-page/', companies_page, name='companies_page'),
     path('leave-types-page/', leave_types_page, name='leave_types_page'),
     path('leave-balances-page/', leave_balances_page, name='leave_balances_page'),
+    path('departments-page/', departments_page, name='departments_page'),
+    path('designations-page/', designations_page, name='designations_page'),
+    path('payroll-page/', payroll_page, name='payroll_page'),
+    path('notifications-page/', notifications_page, name='notifications_page'),
+    path('reports-page/', reports_page, name='reports_page'),
+    path('profile-page/', profile_page, name='profile_page'),
 
     # Customer-only portal pages
     path('customer-attendance/', customer_attendance_page, name='customer_attendance_page'),

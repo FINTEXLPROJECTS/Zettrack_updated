@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZetTrak - Notifications</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .notif-card { background:#fff; border-radius:12px; padding:18px 22px; margin-bottom:12px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border-left:4px solid #86BC25; display:flex; justify-content:space-between; align-items:flex-start; gap:16px; }
+    .notif-card.unread { border-left-color:#86BC25; background:#fafff4; }
+    .notif-card.read { border-left-color:#ccc; background:#f9f9f9; }
+    .notif-title { font-size:14px; font-weight:700; color:#000; margin-bottom:4px; }
+    .notif-msg { font-size:13px; color:#555; }
+    .notif-time { font-size:11px; color:#aaa; margin-top:6px; }
+    .notif-actions { display:flex; gap:8px; flex-shrink:0; }
+    .read-btn { padding:4px 10px; background:#86BC25; color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; }
+    .del-btn  { padding:4px 10px; background:#000; color:#fff; border:none; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; }
+    .badge-unread { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; background:rgba(134,188,37,0.12); color:#86BC25; border:1px solid rgba(134,188,37,0.3); }
+    .badge-read   { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; background:#f5f5f5; color:#999; border:1px solid #ddd; }
+  </style>
+</head>
+<body>
+
+  {% with active_page='notifications' %}{% include '_sidebar.html' %}{% endwith %}
+
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>&#128276; Notifications</h2>
+        <p>Your alerts and system messages</p>
+      </div>
+      <span class="topbar-badge">&#9881; Admin</span>
+    </header>
+
+    <main class="content">
+
+      <div class="form-panel">
+        <div class="section-title"><span>&#128276;</span> Notification Controls</div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="markAllRead()">&#10003; Mark All as Read</button>
+          <button class="btn btn-secondary" onclick="loadNotifications()">&#8635; Refresh</button>
+        </div>
+        <p id="notifMsg" class="message"></p>
+      </div>
+
+      <div id="notifList">
+        <div style="text-align:center; padding:40px; color:#aaa;">Loading notifications...</div>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    if (!localStorage.getItem("access") || localStorage.getItem("userType") !== "admin") {
+      window.location.href = "/login-page/";
+    }
+    const API = window.location.origin + "/api/v1/";
+    function authHeaders() {
+      return { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("access") };
+    }
+    function logout() { localStorage.clear(); window.location.href = "/login-page/"; }
+    function showMsg(text, isError = false) {
+      const el = document.getElementById("notifMsg");
+      el.innerText = text;
+      el.className = "message show" + (isError ? " error" : "");
+    }
+
+    async function markRead(id) {
+      try {
+        const res = await fetch(API + "notifications/" + id + "/mark-read/", { method: "POST", headers: authHeaders() });
+        if (res.ok) loadNotifications();
+        else showMsg("Failed to mark as read", true);
+      } catch { showMsg("Server error", true); }
+    }
+
+    async function deleteNotif(id) {
+      try {
+        const res = await fetch(API + "notifications/" + id + "/", { method: "DELETE", headers: authHeaders() });
+        if (res.status === 204 || res.ok) loadNotifications();
+        else showMsg("Failed to delete", true);
+      } catch { showMsg("Server error", true); }
+    }
+
+    async function markAllRead() {
+      try {
+        const res = await fetch(API + "notifications/mark-all-read/", { method: "POST", headers: authHeaders() });
+        const data = await res.json();
+        showMsg(res.ok ? data.message : "Failed", !res.ok);
+        if (res.ok) loadNotifications();
+      } catch { showMsg("Server error", true); }
+    }
+
+    async function loadNotifications() {
+      const container = document.getElementById("notifList");
+      container.innerHTML = "<div style='text-align:center;padding:40px;color:#aaa;'>Loading...</div>";
+      try {
+        const res = await fetch(API + "notifications/", { headers: authHeaders() });
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data)) { container.innerHTML = "<div style='text-align:center;padding:40px;color:#aaa;'>Failed to load notifications</div>"; return; }
+        if (data.length === 0) { container.innerHTML = "<div style='text-align:center;padding:40px;color:#aaa;'>No notifications found</div>"; return; }
+        container.innerHTML = "";
+        data.forEach(n => {
+          const card = document.createElement("div");
+          card.className = "notif-card " + (n.is_read ? "read" : "unread");
+          const badge = n.is_read ? '<span class="badge-read">Read</span>' : '<span class="badge-unread">New</span>';
+          const readBtn = !n.is_read ? `<button class="read-btn" onclick="markRead(${n.id})">&#10003; Read</button>` : "";
+          card.innerHTML = `
+            <div>
+              <div class="notif-title">${n.title??""} ${badge}</div>
+              <div class="notif-msg">${n.message??""}</div>
+              <div class="notif-time">${n.created_at ? new Date(n.created_at).toLocaleString() : ""}</div>
+            </div>
+            <div class="notif-actions">
+              ${readBtn}
+              <button class="del-btn" onclick="deleteNotif(${n.id})">&#128465;</button>
+            </div>`;
+          container.appendChild(card);
+        });
+      } catch { container.innerHTML = "<div style='text-align:center;padding:40px;color:#aaa;'>Server connection failed</div>"; }
+    }
+
+    loadNotifications();
+  </script>
+</body>
+</html>
