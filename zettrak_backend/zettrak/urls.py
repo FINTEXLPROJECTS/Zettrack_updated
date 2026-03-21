@@ -91,4 +91,10 @@ urlpatterns = [
 
     # Reports API
     path('api/v1/reports/', include('reports.urls')),
+
+    # Timesheets API
+    path('api/v1/timesheets/', include('timesheets.api_urls')),
+
+    # Timesheet template pages
+    path('', include('timesheets.page_urls')),
 ]

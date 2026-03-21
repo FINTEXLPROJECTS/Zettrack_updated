@@ -1,0 +1,323 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Timesheets | ZetTrak Admin</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .ts-filters { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+    .ts-filters select, .ts-filters input { padding:8px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; }
+    .ts-filters button { padding:8px 18px; background:#86BC25; color:#000; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
+    .status-badge { padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+    .badge-Draft { background:#f0f0f0; color:#555; }
+    .badge-Submitted { background:#fff3cd; color:#856404; }
+    .badge-Approved { background:#d4edda; color:#155724; }
+    .badge-Rejected { background:#f8d7da; color:#721c24; }
+    .bulk-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+    .bulk-bar button { padding:7px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
+    .btn-approve-bulk { background:#86BC25; color:#000; }
+    .btn-reject-bulk { background:#dc3545; color:#fff; }
+    .action-btn { padding:4px 10px; border:none; border-radius:5px; cursor:pointer; font-size:12px; font-weight:600; margin:0 2px; }
+    .btn-approve { background:#86BC25; color:#000; }
+    .btn-reject { background:#dc3545; color:#fff; }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:#fff; border-radius:12px; padding:30px; width:90%; max-width:480px; }
+    .modal-box h3 { margin:0 0 16px; }
+    .modal-box textarea { width:100%; min-height:80px; padding:10px; border:1px solid #ddd; border-radius:6px; resize:vertical; }
+    .modal-box .modal-btns { display:flex; gap:10px; margin-top:14px; justify-content:flex-end; }
+    .modal-box .modal-btns button { padding:8px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
+    .btn-cancel { background:#eee; color:#333; }
+    .btn-confirm-reject { background:#dc3545; color:#fff; }
+    .projects-section { margin-bottom:30px; background:#fff; border-radius:10px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+    .projects-section h3 { margin:0 0 14px; color:#1a2a3a; }
+    .proj-form { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+    .proj-form input { flex:1; min-width:160px; padding:8px 12px; border:1px solid #ddd; border-radius:6px; }
+    .proj-form button { padding:8px 18px; background:#86BC25; color:#000; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
+  </style>
+</head>
+<body>
+
+{% with active_page='timesheets' %}{% include '_sidebar.html' %}{% endwith %}
+
+<div class="main-content">
+  <div class="topbar">
+    <h2 class="page-title">&#128203; Timesheets</h2>
+    <div class="topbar-right">
+      <span id="adminName" style="font-weight:600;"></span>
+    </div>
+  </div>
+
+  <!-- Projects Section -->
+  <div class="projects-section">
+    <h3>&#128193; Projects</h3>
+    <div class="proj-form">
+      <input type="text" id="projName" placeholder="Project name" />
+      <select id="projCompany">
+        <option value="">Select Company</option>
+      </select>
+      <button onclick="addProject()">+ Add Project</button>
+    </div>
+    <table class="data-table" id="projectsTable">
+      <thead><tr><th>ID</th><th>Project Name</th><th>Company</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody id="projectsBody"><tr><td colspan="5" style="text-align:center;color:#aaa;">Loading...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Filters -->
+  <div class="panel">
+    <div class="ts-filters">
+      <select id="filterEmployee"><option value="">All Employees</option></select>
+      <select id="filterProject"><option value="">All Projects</option></select>
+      <input type="date" id="filterDate" />
+      <select id="filterStatus">
+        <option value="">All Status</option>
+        <option value="Draft">Draft</option>
+        <option value="Submitted">Submitted</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+      <button onclick="loadTimesheets()">&#128269; Filter</button>
+      <button onclick="clearFilters()" style="background:#eee;color:#333;">Clear</button>
+    </div>
+
+    <!-- Bulk actions -->
+    <div class="bulk-bar">
+      <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" /> Select All
+      <button class="btn-approve-bulk" onclick="bulkAction('approve')">&#10003; Bulk Approve</button>
+      <button class="btn-reject-bulk" onclick="openBulkReject()">&#10007; Bulk Reject</button>
+      <span id="bulkMsg" style="color:#86BC25;font-weight:600;"></span>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAllHead" onchange="toggleSelectAll(this)"/></th>
+          <th>Employee</th><th>Project</th><th>Date</th>
+          <th>Hours</th><th>Billable</th><th>Task</th>
+          <th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="timesheetsBody">
+        <tr><td colspan="9" style="text-align:center;color:#aaa;">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal-box">
+    <h3>&#10007; Reject Timesheet</h3>
+    <textarea id="rejectReason" placeholder="Enter rejection reason..."></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm-reject" onclick="confirmReject()">Reject</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('accessToken');
+  if (!token || localStorage.getItem('userType') !== 'admin') {
+    window.location.href = '/login-page/';
+  }
+  document.getElementById('adminName').textContent = localStorage.getItem('username') || 'Admin';
+
+  let rejectTargetId = null;
+  let rejectTargetBulk = false;
+
+  async function apiFetch(url, opts = {}) {
+    return fetch(url, {
+      ...opts,
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    });
+  }
+
+  // ── Load employees for filter
+  async function loadEmployeeFilter() {
+    const r = await apiFetch('/api/v1/employees/');
+    if (!r.ok) return;
+    const data = await r.json();
+    const sel = document.getElementById('filterEmployee');
+    data.forEach(e => {
+      const o = document.createElement('option');
+      o.value = e.id;
+      o.textContent = (e.first_name || '') + ' ' + (e.last_name || '');
+      sel.appendChild(o);
+    });
+  }
+
+  // ── Load companies for project form
+  async function loadCompanies() {
+    const r = await apiFetch('/api/v1/companies/');
+    if (!r.ok) return;
+    const data = await r.json();
+    const sel = document.getElementById('projCompany');
+    data.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.id;
+      o.textContent = c.name;
+      sel.appendChild(o);
+    });
+  }
+
+  // ── Load projects
+  async function loadProjects() {
+    const r = await apiFetch('/api/v1/timesheets/projects/');
+    if (!r.ok) return;
+    const data = await r.json();
+    const sel = document.getElementById('filterProject');
+    sel.innerHTML = '<option value="">All Projects</option>';
+    const tbody = document.getElementById('projectsBody');
+    tbody.innerHTML = '';
+    data.forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.id;
+      o.textContent = p.name;
+      sel.appendChild(o);
+
+      tbody.innerHTML += `<tr>
+        <td>${p.id}</td>
+        <td>${p.name}</td>
+        <td>${p.company}</td>
+        <td><span class="status-badge ${p.is_active ? 'badge-Approved' : 'badge-Rejected'}">${p.is_active ? 'Active' : 'Inactive'}</span></td>
+        <td><button class="action-btn btn-reject" onclick="deleteProject(${p.id})">Delete</button></td>
+      </tr>`;
+    });
+    if (!data.length) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;">No projects yet</td></tr>';
+  }
+
+  async function addProject() {
+    const name = document.getElementById('projName').value.trim();
+    const company = document.getElementById('projCompany').value;
+    if (!name || !company) return alert('Enter project name and select company');
+    const r = await apiFetch('/api/v1/timesheets/projects/', { method: 'POST', body: JSON.stringify({ name, company }) });
+    if (r.ok) { document.getElementById('projName').value = ''; await loadProjects(); }
+    else alert('Failed to add project');
+  }
+
+  async function deleteProject(id) {
+    if (!confirm('Delete this project?')) return;
+    await apiFetch('/api/v1/timesheets/projects/' + id + '/', { method: 'DELETE' });
+    loadProjects();
+  }
+
+  // ── Load timesheets
+  async function loadTimesheets() {
+    const emp = document.getElementById('filterEmployee').value;
+    const proj = document.getElementById('filterProject').value;
+    const date = document.getElementById('filterDate').value;
+    const st = document.getElementById('filterStatus').value;
+    let url = '/api/v1/timesheets/?';
+    if (emp) url += 'employee=' + emp + '&';
+    if (proj) url += 'project=' + proj + '&';
+    if (date) url += 'date=' + date + '&';
+    if (st) url += 'status=' + st;
+
+    const r = await apiFetch(url);
+    const data = await r.json();
+    const tbody = document.getElementById('timesheetsBody');
+    tbody.innerHTML = '';
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;">No timesheets found</td></tr>';
+      return;
+    }
+    data.forEach(ts => {
+      const canAct = ts.status === 'Submitted';
+      tbody.innerHTML += `<tr>
+        <td><input type="checkbox" class="ts-check" value="${ts.id}" /></td>
+        <td>${ts.employee_name || ts.employee}</td>
+        <td>${ts.project_name || ts.project}</td>
+        <td>${ts.date}</td>
+        <td>${ts.hours}h</td>
+        <td>${ts.is_billable ? '&#9989; Yes' : '&#10060; No'}</td>
+        <td title="${ts.task_description}">${ts.task_description.length > 40 ? ts.task_description.substring(0,40)+'...' : ts.task_description}</td>
+        <td><span class="status-badge badge-${ts.status}">${ts.status}</span>${ts.rejection_reason ? '<br><small style="color:#dc3545">'+ts.rejection_reason+'</small>' : ''}</td>
+        <td>
+          ${canAct ? `<button class="action-btn btn-approve" onclick="approveOne(${ts.id})">Approve</button>
+          <button class="action-btn btn-reject" onclick="openRejectOne(${ts.id})">Reject</button>` : '—'}
+        </td>
+      </tr>`;
+    });
+  }
+
+  function clearFilters() {
+    document.getElementById('filterEmployee').value = '';
+    document.getElementById('filterProject').value = '';
+    document.getElementById('filterDate').value = '';
+    document.getElementById('filterStatus').value = '';
+    loadTimesheets();
+  }
+
+  // ── Approve single
+  async function approveOne(id) {
+    const r = await apiFetch('/api/v1/timesheets/' + id + '/approve/', { method: 'POST' });
+    const d = await r.json();
+    alert(d.message || d.error);
+    loadTimesheets();
+  }
+
+  // ── Reject single
+  function openRejectOne(id) {
+    rejectTargetId = id;
+    rejectTargetBulk = false;
+    document.getElementById('rejectReason').value = '';
+    document.getElementById('rejectModal').classList.add('open');
+  }
+
+  function openBulkReject() {
+    rejectTargetBulk = true;
+    document.getElementById('rejectReason').value = '';
+    document.getElementById('rejectModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('rejectModal').classList.remove('open');
+    rejectTargetId = null;
+    rejectTargetBulk = false;
+  }
+
+  async function confirmReject() {
+    const reason = document.getElementById('rejectReason').value.trim();
+    if (!reason) return alert('Please enter a rejection reason');
+    if (rejectTargetBulk) {
+      await bulkAction('reject', reason);
+    } else {
+      const r = await apiFetch('/api/v1/timesheets/' + rejectTargetId + '/reject/', {
+        method: 'POST', body: JSON.stringify({ rejection_reason: reason })
+      });
+      const d = await r.json();
+      alert(d.message || d.error);
+      loadTimesheets();
+    }
+    closeModal();
+  }
+
+  // ── Bulk actions
+  function toggleSelectAll(cb) {
+    document.querySelectorAll('.ts-check').forEach(c => c.checked = cb.checked);
+  }
+
+  async function bulkAction(action, reason) {
+    const ids = [...document.querySelectorAll('.ts-check:checked')].map(c => parseInt(c.value));
+    if (!ids.length) return alert('Select at least one timesheet');
+    const body = { action, ids };
+    if (reason) body.rejection_reason = reason;
+    const r = await apiFetch('/api/v1/timesheets/bulk-action/', { method: 'POST', body: JSON.stringify(body) });
+    const d = await r.json();
+    document.getElementById('bulkMsg').textContent = d.message || d.error;
+    setTimeout(() => document.getElementById('bulkMsg').textContent = '', 3000);
+    loadTimesheets();
+  }
+
+  // ── Init
+  loadEmployeeFilter();
+  loadCompanies();
+  loadProjects();
+  loadTimesheets();
+</script>
+</body>
+</html>

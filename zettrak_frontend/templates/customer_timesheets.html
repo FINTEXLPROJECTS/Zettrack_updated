@@ -1,0 +1,252 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Timesheets | ZetTrak</title>
+  <link rel="stylesheet" href="{% static 'app.css' %}" />
+  <style>
+    .ts-form { background:#fff; border-radius:10px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:24px; }
+    .ts-form h3 { margin:0 0 18px; color:#1a2a3a; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+    .form-row.full { grid-template-columns:1fr; }
+    .form-group label { display:block; font-size:13px; font-weight:600; color:#555; margin-bottom:5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:7px; font-size:14px; box-sizing:border-box;
+    }
+    .form-group textarea { min-height:70px; resize:vertical; }
+    .form-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-draft { padding:9px 22px; background:#f0f0f0; color:#333; border:none; border-radius:7px; cursor:pointer; font-weight:600; }
+    .btn-submit { padding:9px 22px; background:#86BC25; color:#000; border:none; border-radius:7px; cursor:pointer; font-weight:600; }
+    .billable-row { display:flex; align-items:center; gap:8px; margin-bottom:14px; font-size:14px; font-weight:600; }
+    .status-badge { padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+    .badge-Draft { background:#f0f0f0; color:#555; }
+    .badge-Submitted { background:#fff3cd; color:#856404; }
+    .badge-Approved { background:#d4edda; color:#155724; }
+    .badge-Rejected { background:#f8d7da; color:#721c24; }
+    .action-btn { padding:4px 10px; border:none; border-radius:5px; cursor:pointer; font-size:12px; font-weight:600; margin:0 2px; }
+    .btn-edit { background:#86BC25; color:#000; }
+    .btn-delete { background:#dc3545; color:#fff; }
+    .btn-submit-ts { background:#007bff; color:#fff; }
+    .success-msg { color:#86BC25; font-weight:600; margin-bottom:10px; }
+    .error-msg { color:#dc3545; font-weight:600; margin-bottom:10px; }
+  </style>
+</head>
+<body>
+
+<!-- Employee Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">ZetTrak</div>
+    <div class="brand-sub">Employee Portal</div>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="nav-section-label">My Space</span>
+    <a href="/customer-dashboard/">&#127968; Dashboard</a>
+    <a href="/customer-attendance/">&#128203; Attendance</a>
+    <a href="/customer-leaves/">&#127807; Apply Leave</a>
+    <a href="/customer-leave-history/">&#128202; Leave History</a>
+    <a href="/customer-timesheets/" class="active">&#128336; Timesheets</a>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="logout()">&#128682; Logout</button>
+  </div>
+</aside>
+
+<div class="main-content">
+  <div class="topbar">
+    <h2 class="page-title">&#128336; My Timesheets</h2>
+    <div class="topbar-right"><span id="empName" style="font-weight:600;"></span></div>
+  </div>
+
+  <!-- Add Entry Form -->
+  <div class="ts-form">
+    <h3>&#43; Add Timesheet Entry</h3>
+    <div id="formMsg"></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Project *</label>
+        <select id="tsProject"><option value="">Select Project</option></select>
+      </div>
+      <div class="form-group">
+        <label>Date *</label>
+        <input type="date" id="tsDate" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Hours *</label>
+        <input type="number" id="tsHours" placeholder="e.g. 8" min="0.5" max="24" step="0.5" />
+      </div>
+      <div class="form-group billable-row" style="padding-top:22px;">
+        <input type="checkbox" id="tsBillable" checked />
+        <label for="tsBillable">Billable Hours</label>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>Task Description *</label>
+        <textarea id="tsTask" placeholder="Describe the work done..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-draft" onclick="saveTimesheet('Draft')">&#128190; Save as Draft</button>
+      <button class="btn-submit" onclick="saveTimesheet('submit')">&#9993; Save &amp; Submit</button>
+    </div>
+  </div>
+
+  <!-- My Timesheets List -->
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <h3 style="margin:0;">My Timesheet History</h3>
+      <select id="statusFilter" onchange="loadMyTimesheets()" style="padding:7px 12px;border:1px solid #ddd;border-radius:6px;">
+        <option value="">All Status</option>
+        <option value="Draft">Draft</option>
+        <option value="Submitted">Submitted</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Date</th><th>Project</th><th>Hours</th><th>Billable</th>
+          <th>Task</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="myTimesheetsBody">
+        <tr><td colspan="7" style="text-align:center;color:#aaa;">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const token = localStorage.getItem('accessToken');
+  const empDataRaw = localStorage.getItem('employeeData');
+  if (!token || localStorage.getItem('userType') !== 'customer') {
+    window.location.href = '/login-page/';
+  }
+  const empData = empDataRaw ? JSON.parse(empDataRaw) : {};
+  document.getElementById('empName').textContent = (empData.first_name || '') + ' ' + (empData.last_name || '');
+  document.getElementById('tsDate').valueAsDate = new Date();
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = '/login-page/';
+  }
+
+  async function apiFetch(url, opts = {}) {
+    return fetch(url, {
+      ...opts,
+      headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json', ...(opts.headers || {}) }
+    });
+  }
+
+  // Load projects
+  async function loadProjects() {
+    const r = await apiFetch('/api/v1/timesheets/projects/');
+    if (!r.ok) return;
+    const data = await r.json();
+    const sel = document.getElementById('tsProject');
+    data.forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.id;
+      o.textContent = p.name;
+      sel.appendChild(o);
+    });
+  }
+
+  // Save timesheet
+  async function saveTimesheet(mode) {
+    const project = document.getElementById('tsProject').value;
+    const date = document.getElementById('tsDate').value;
+    const hours = document.getElementById('tsHours').value;
+    const task_description = document.getElementById('tsTask').value.trim();
+    const is_billable = document.getElementById('tsBillable').checked;
+    const msgEl = document.getElementById('formMsg');
+
+    if (!project || !date || !hours || !task_description) {
+      msgEl.innerHTML = '<p class="error-msg">Please fill all required fields.</p>';
+      return;
+    }
+
+    const body = { project, date, hours, task_description, is_billable };
+    const r = await apiFetch('/api/v1/timesheets/', { method: 'POST', body: JSON.stringify(body) });
+    const data = await r.json();
+
+    if (!r.ok) {
+      msgEl.innerHTML = '<p class="error-msg">' + JSON.stringify(data) + '</p>';
+      return;
+    }
+
+    // If submit mode, also submit it
+    if (mode === 'submit') {
+      await apiFetch('/api/v1/timesheets/' + data.id + '/submit/', { method: 'POST' });
+    }
+
+    msgEl.innerHTML = '<p class="success-msg">&#10003; Timesheet ' + (mode === 'submit' ? 'submitted' : 'saved as draft') + ' successfully!</p>';
+    document.getElementById('tsProject').value = '';
+    document.getElementById('tsHours').value = '';
+    document.getElementById('tsTask').value = '';
+    document.getElementById('tsBillable').checked = true;
+    document.getElementById('tsDate').valueAsDate = new Date();
+    setTimeout(() => msgEl.innerHTML = '', 4000);
+    loadMyTimesheets();
+  }
+
+  // Load my timesheets
+  async function loadMyTimesheets() {
+    const st = document.getElementById('statusFilter').value;
+    let url = '/api/v1/timesheets/';
+    if (st) url += '?status=' + st;
+    const r = await apiFetch(url);
+    const data = await r.json();
+    const tbody = document.getElementById('myTimesheetsBody');
+    tbody.innerHTML = '';
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;">No timesheets found</td></tr>';
+      return;
+    }
+    data.forEach(ts => {
+      const isDraft = ts.status === 'Draft';
+      tbody.innerHTML += `<tr>
+        <td>${ts.date}</td>
+        <td>${ts.project_name || ts.project}</td>
+        <td>${ts.hours}h</td>
+        <td>${ts.is_billable ? '&#9989;' : '&#10060;'}</td>
+        <td title="${ts.task_description}">${ts.task_description.length > 35 ? ts.task_description.substring(0,35)+'...' : ts.task_description}</td>
+        <td>
+          <span class="status-badge badge-${ts.status}">${ts.status}</span>
+          ${ts.rejection_reason ? '<br><small style="color:#dc3545;font-size:11px;">'+ts.rejection_reason+'</small>' : ''}
+        </td>
+        <td>
+          ${isDraft ? `
+            <button class="action-btn btn-submit-ts" onclick="submitOne(${ts.id})">Submit</button>
+            <button class="action-btn btn-delete" onclick="deleteOne(${ts.id})">Delete</button>
+          ` : '—'}
+        </td>
+      </tr>`;
+    });
+  }
+
+  async function submitOne(id) {
+    if (!confirm('Submit this timesheet? You cannot edit it after submission.')) return;
+    const r = await apiFetch('/api/v1/timesheets/' + id + '/submit/', { method: 'POST' });
+    const d = await r.json();
+    alert(d.message || d.error);
+    loadMyTimesheets();
+  }
+
+  async function deleteOne(id) {
+    if (!confirm('Delete this draft timesheet?')) return;
+    await apiFetch('/api/v1/timesheets/' + id + '/', { method: 'DELETE' });
+    loadMyTimesheets();
+  }
+
+  loadProjects();
+  loadMyTimesheets();
+</script>
+</body>
+</html>
