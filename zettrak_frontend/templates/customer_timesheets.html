@@ -7,30 +7,95 @@
   <title>My Timesheets | ZetTrak</title>
   <link rel="stylesheet" href="{% static 'app.css' %}" />
   <style>
-    .ts-form { background:#fff; border-radius:10px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,0.07); margin-bottom:24px; }
-    .ts-form h3 { margin:0 0 18px; color:#1a2a3a; }
-    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
-    .form-row.full { grid-template-columns:1fr; }
-    .form-group label { display:block; font-size:13px; font-weight:600; color:#555; margin-bottom:5px; }
-    .form-group input, .form-group select, .form-group textarea {
-      width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:7px; font-size:14px; box-sizing:border-box;
+    /* ── SUMMARY CARDS ── */
+    .ts-summary { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
+    .summary-card { background:#fff; border-radius:12px; padding:18px 16px; box-shadow:0 2px 10px rgba(0,0,0,0.07); border-top:4px solid #86BC25; text-align:center; }
+    .summary-card.alt { border-top-color:#000; background:#f8f8f8; }
+    .summary-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#777; margin-bottom:6px; }
+    .summary-value { font-size:26px; font-weight:800; color:#86BC25; }
+    .summary-card.alt .summary-value { color:#000; }
+
+    /* ── FORM CARD ── */
+    .form-card { background:#fff; border-radius:14px; padding:26px 28px; box-shadow:0 2px 12px rgba(0,0,0,0.08); margin-bottom:24px; border-top:4px solid #86BC25; }
+    .form-card-header { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
+    .form-card-header h3 { margin:0; font-size:17px; font-weight:700; color:#000; }
+    .form-card-header .form-icon { width:38px; height:38px; background:#86BC25; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+
+    /* ── FORM FIELDS ── */
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+    .form-grid.one { grid-template-columns:1fr; }
+    .form-field label { display:block; font-size:12px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+    .form-field input, .form-field select, .form-field textarea {
+      width:100%; padding:10px 14px; border:1.5px solid #e0e0e0; border-radius:8px;
+      font-size:14px; outline:none; transition:border-color 0.2s, box-shadow 0.2s; box-sizing:border-box;
     }
-    .form-group textarea { min-height:70px; resize:vertical; }
-    .form-actions { display:flex; gap:10px; flex-wrap:wrap; }
-    .btn-draft { padding:9px 22px; background:#f0f0f0; color:#333; border:none; border-radius:7px; cursor:pointer; font-weight:600; }
-    .btn-submit { padding:9px 22px; background:#86BC25; color:#000; border:none; border-radius:7px; cursor:pointer; font-weight:600; }
-    .billable-row { display:flex; align-items:center; gap:8px; margin-bottom:14px; font-size:14px; font-weight:600; }
-    .status-badge { padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+    .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+      border-color:#86BC25; box-shadow:0 0 0 3px rgba(134,188,37,0.12);
+    }
+    .form-field textarea { min-height:80px; resize:vertical; }
+    .billable-field { display:flex; align-items:center; gap:10px; padding-top:28px; }
+    .billable-field input[type=checkbox] { width:18px; height:18px; accent-color:#86BC25; cursor:pointer; }
+    .billable-field label { font-size:14px; font-weight:600; color:#333; cursor:pointer; margin:0; text-transform:none; letter-spacing:0; }
+
+    /* ── BUTTONS ── */
+    .form-actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:4px; }
+    .btn-draft { padding:11px 26px; background:#f0f0f0; color:#333; border:none; border-radius:9px; cursor:pointer; font-weight:700; font-size:14px; transition:background 0.2s; }
+    .btn-draft:hover { background:#e0e0e0; }
+    .btn-submit-form { padding:11px 26px; background:#86BC25; color:#000; border:none; border-radius:9px; cursor:pointer; font-weight:700; font-size:14px; transition:background 0.2s, box-shadow 0.2s; }
+    .btn-submit-form:hover { background:#6fa01e; box-shadow:0 4px 14px rgba(134,188,37,0.35); }
+
+    /* ── ALERT ── */
+    .form-alert { padding:12px 16px; border-radius:8px; font-size:14px; font-weight:600; margin-bottom:14px; display:none; }
+    .form-alert.success { background:#e8f5e9; color:#2e7d32; border-left:4px solid #86BC25; display:block; }
+    .form-alert.error { background:#fce4ec; color:#c62828; border-left:4px solid #c62828; display:block; }
+
+    /* ── HISTORY CARD ── */
+    .history-card { background:#fff; border-radius:14px; padding:24px 26px; box-shadow:0 2px 12px rgba(0,0,0,0.07); }
+    .history-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+    .history-header h3 { margin:0; font-size:16px; font-weight:700; color:#000; }
+    .history-filter { padding:8px 12px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:13px; outline:none; }
+    .history-filter:focus { border-color:#86BC25; }
+
+    /* ── TABLE ── */
+    .ts-table-wrap { overflow-x:auto; border-radius:10px; border:1px solid #f0f0f0; }
+    .ts-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .ts-table thead tr { background:#000; }
+    .ts-table thead th { padding:12px 14px; text-align:left; color:#fff; font-size:11px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; white-space:nowrap; }
+    .ts-table thead th:first-child { border-radius:8px 0 0 0; }
+    .ts-table thead th:last-child { border-radius:0 8px 0 0; }
+    .ts-table tbody tr { border-bottom:1px solid #f0f0f0; transition:background 0.15s; }
+    .ts-table tbody tr:hover { background:#f9fff0; }
+    .ts-table tbody td { padding:12px 14px; color:#333; vertical-align:middle; }
+
+    /* ── BADGES ── */
+    .badge { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; }
     .badge-Draft { background:#f0f0f0; color:#555; }
-    .badge-Submitted { background:#fff3cd; color:#856404; }
-    .badge-Approved { background:#d4edda; color:#155724; }
-    .badge-Rejected { background:#f8d7da; color:#721c24; }
-    .action-btn { padding:4px 10px; border:none; border-radius:5px; cursor:pointer; font-size:12px; font-weight:600; margin:0 2px; }
-    .btn-edit { background:#86BC25; color:#000; }
-    .btn-delete { background:#dc3545; color:#fff; }
-    .btn-submit-ts { background:#007bff; color:#fff; }
-    .success-msg { color:#86BC25; font-weight:600; margin-bottom:10px; }
-    .error-msg { color:#dc3545; font-weight:600; margin-bottom:10px; }
+    .badge-Submitted { background:#fff8e1; color:#f57c00; border:1px solid #ffe082; }
+    .badge-Approved { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; }
+    .badge-Rejected { background:#fce4ec; color:#c62828; border:1px solid #ef9a9a; }
+
+    /* ── ACTION BUTTONS ── */
+    .btn-ts { padding:5px 12px; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:700; transition:opacity 0.2s; display:inline-block; }
+    .btn-ts-submit { background:#86BC25; color:#000; }
+    .btn-ts-delete { background:#fce4ec; color:#c62828; margin-left:4px; }
+    .btn-ts:hover { opacity:0.8; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align:center; padding:40px 20px; color:#bbb; }
+    .empty-state .empty-icon { font-size:44px; display:block; margin-bottom:10px; }
+    .empty-state p { font-size:14px; }
+
+    /* ── TOAST ── */
+    .toast { position:fixed; bottom:24px; right:24px; background:#000; color:#86BC25; padding:12px 22px; border-radius:10px; font-weight:700; font-size:14px; z-index:9999; display:none; box-shadow:0 6px 20px rgba(0,0,0,0.2); }
+    .toast.show { display:block; animation:fadeUp 0.3s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+    @media(max-width:768px) {
+      .ts-summary { grid-template-columns:1fr 1fr; }
+      .form-grid { grid-template-columns:1fr; }
+      .form-card { padding:18px; }
+      .history-card { padding:16px; }
+    }
   </style>
 </head>
 <body>
@@ -43,98 +108,160 @@
   </div>
   <nav class="sidebar-nav">
     <span class="nav-section-label">My Space</span>
-    <a href="/customer-dashboard/">&#127968; Dashboard</a>
-    <a href="/customer-attendance/">&#128203; Attendance</a>
-    <a href="/customer-leaves/">&#127807; Apply Leave</a>
-    <a href="/customer-leave-history/">&#128202; Leave History</a>
-    <a href="/customer-timesheets/" class="active">&#128336; Timesheets</a>
+    <a href="/customer-dashboard/"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/customer-attendance/"><span class="nav-icon">📋</span> Attendance</a>
+    <a href="/customer-leaves/"><span class="nav-icon">🌿</span> Apply Leave</a>
+    <a href="/customer-leave-history/"><span class="nav-icon">📊</span> Leave History</a>
+    <a href="/customer-timesheets/" class="active"><span class="nav-icon">🕒</span> Timesheets</a>
   </nav>
   <div class="sidebar-footer">
-    <button class="logout-btn" onclick="logout()">&#128682; Logout</button>
+    <button class="logout-btn" onclick="logout()">🚪 Logout</button>
   </div>
 </aside>
 
-<div class="main-content">
-  <div class="topbar">
-    <h2 class="page-title">&#128336; My Timesheets</h2>
-    <div class="topbar-right"><span id="empName" style="font-weight:600;"></span></div>
-  </div>
+<div class="main-wrapper">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h2>🕒 My Timesheets</h2>
+      <p>Track your work hours by project and submit for approval</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span id="empName" style="font-size:13px;color:#888;font-weight:600;"></span>
+      <span class="topbar-badge">👤 Employee</span>
+    </div>
+  </header>
 
-  <!-- Add Entry Form -->
-  <div class="ts-form">
-    <h3>&#43; Add Timesheet Entry</h3>
-    <div id="formMsg"></div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Project *</label>
-        <select id="tsProject"><option value="">Select Project</option></select>
-      </div>
-      <div class="form-group">
-        <label>Date *</label>
-        <input type="date" id="tsDate" />
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Hours *</label>
-        <input type="number" id="tsHours" placeholder="e.g. 8" min="0.5" max="24" step="0.5" />
-      </div>
-      <div class="form-group billable-row" style="padding-top:22px;">
-        <input type="checkbox" id="tsBillable" checked />
-        <label for="tsBillable">Billable Hours</label>
-      </div>
-    </div>
-    <div class="form-row full">
-      <div class="form-group">
-        <label>Task Description *</label>
-        <textarea id="tsTask" placeholder="Describe the work done..."></textarea>
-      </div>
-    </div>
-    <div class="form-actions">
-      <button class="btn-draft" onclick="saveTimesheet('Draft')">&#128190; Save as Draft</button>
-      <button class="btn-submit" onclick="saveTimesheet('submit')">&#9993; Save &amp; Submit</button>
-    </div>
-  </div>
+  <main class="content">
 
-  <!-- My Timesheets List -->
-  <div class="panel">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-      <h3 style="margin:0;">My Timesheet History</h3>
-      <select id="statusFilter" onchange="loadMyTimesheets()" style="padding:7px 12px;border:1px solid #ddd;border-radius:6px;">
-        <option value="">All Status</option>
-        <option value="Draft">Draft</option>
-        <option value="Submitted">Submitted</option>
-        <option value="Approved">Approved</option>
-        <option value="Rejected">Rejected</option>
-      </select>
+    <!-- SUMMARY -->
+    <div class="ts-summary">
+      <div class="summary-card">
+        <div class="summary-label">Total</div>
+        <div class="summary-value" id="sumTotal">—</div>
+      </div>
+      <div class="summary-card alt">
+        <div class="summary-label">Drafts</div>
+        <div class="summary-value" id="sumDraft">—</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Submitted</div>
+        <div class="summary-value" id="sumSubmitted">—</div>
+      </div>
+      <div class="summary-card alt">
+        <div class="summary-label">Approved</div>
+        <div class="summary-value" id="sumApproved">—</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">Hours Logged</div>
+        <div class="summary-value" id="sumHours">—</div>
+      </div>
     </div>
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Date</th><th>Project</th><th>Hours</th><th>Billable</th>
-          <th>Task</th><th>Status</th><th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="myTimesheetsBody">
-        <tr><td colspan="7" style="text-align:center;color:#aaa;">Loading...</td></tr>
-      </tbody>
-    </table>
-  </div>
+
+    <!-- ADD ENTRY FORM -->
+    <div class="form-card">
+      <div class="form-card-header">
+        <div class="form-icon">➕</div>
+        <h3>Add Timesheet Entry</h3>
+      </div>
+
+      <div id="formAlert" class="form-alert"></div>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Project *</label>
+          <select id="tsProject"><option value="">Select a project</option></select>
+        </div>
+        <div class="form-field">
+          <label>Date *</label>
+          <input type="date" id="tsDate" />
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Hours Worked *</label>
+          <input type="number" id="tsHours" placeholder="e.g. 8" min="0.5" max="24" step="0.5" />
+        </div>
+        <div class="form-field billable-field">
+          <input type="checkbox" id="tsBillable" checked />
+          <label for="tsBillable">Billable Hours</label>
+        </div>
+      </div>
+
+      <div class="form-grid one">
+        <div class="form-field">
+          <label>Task Description *</label>
+          <textarea id="tsTask" placeholder="Describe what you worked on today..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-draft" onclick="saveTimesheet('Draft')">💾 Save as Draft</button>
+        <button class="btn-submit-form" onclick="saveTimesheet('submit')">✉ Save & Submit</button>
+      </div>
+    </div>
+
+    <!-- HISTORY TABLE -->
+    <div class="history-card">
+      <div class="history-header">
+        <h3>📋 Timesheet History</h3>
+        <select class="history-filter" id="statusFilter" onchange="loadMyTimesheets()">
+          <option value="">All Status</option>
+          <option value="Draft">Draft</option>
+          <option value="Submitted">Submitted</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
+
+      <div class="ts-table-wrap">
+        <table class="ts-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Project</th>
+              <th>Hours</th>
+              <th>Billable</th>
+              <th>Task Description</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="myTimesheetsBody">
+            <tr><td colspan="7"><div class="empty-state"><span class="empty-icon">🕒</span><p>Loading your timesheets...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem('accessToken') || localStorage.getItem('access');
   const empDataRaw = localStorage.getItem('employeeData');
-  if (!token || localStorage.getItem('userType') !== 'customer') {
-    window.location.href = '/login-page/';
-  }
+  if (!token || localStorage.getItem('userType') !== 'customer') window.location.href = '/login-page/';
+
   const empData = empDataRaw ? JSON.parse(empDataRaw) : {};
   document.getElementById('empName').textContent = (empData.first_name || '') + ' ' + (empData.last_name || '');
   document.getElementById('tsDate').valueAsDate = new Date();
 
-  function logout() {
-    localStorage.clear();
-    window.location.href = '/login-page/';
+  function logout() { localStorage.clear(); window.location.href = '/login-page/'; }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function showAlert(msg, type) {
+    const el = document.getElementById('formAlert');
+    el.textContent = msg;
+    el.className = 'form-alert ' + type;
+    setTimeout(() => { el.className = 'form-alert'; el.textContent = ''; }, 4000);
   }
 
   async function apiFetch(url, opts = {}) {
@@ -144,31 +271,28 @@
     });
   }
 
-  // Load projects
   async function loadProjects() {
     const r = await apiFetch('/api/v1/timesheets/projects/');
     if (!r.ok) return;
     const data = await r.json();
     const sel = document.getElementById('tsProject');
+    sel.innerHTML = '<option value="">Select a project</option>';
     data.forEach(p => {
       const o = document.createElement('option');
-      o.value = p.id;
-      o.textContent = p.name;
+      o.value = p.id; o.textContent = p.name;
       sel.appendChild(o);
     });
   }
 
-  // Save timesheet
   async function saveTimesheet(mode) {
     const project = document.getElementById('tsProject').value;
     const date = document.getElementById('tsDate').value;
     const hours = document.getElementById('tsHours').value;
     const task_description = document.getElementById('tsTask').value.trim();
     const is_billable = document.getElementById('tsBillable').checked;
-    const msgEl = document.getElementById('formMsg');
 
     if (!project || !date || !hours || !task_description) {
-      msgEl.innerHTML = '<p class="error-msg">Please fill all required fields.</p>';
+      showAlert('Please fill all required fields.', 'error');
       return;
     }
 
@@ -177,71 +301,80 @@
     const data = await r.json();
 
     if (!r.ok) {
-      msgEl.innerHTML = '<p class="error-msg">' + JSON.stringify(data) + '</p>';
+      showAlert(JSON.stringify(data), 'error');
       return;
     }
 
-    // If submit mode, also submit it
     if (mode === 'submit') {
       await apiFetch('/api/v1/timesheets/' + data.id + '/submit/', { method: 'POST' });
+      showAlert('✔ Timesheet submitted successfully!', 'success');
+    } else {
+      showAlert('✔ Timesheet saved as draft.', 'success');
     }
 
-    msgEl.innerHTML = '<p class="success-msg">&#10003; Timesheet ' + (mode === 'submit' ? 'submitted' : 'saved as draft') + ' successfully!</p>';
     document.getElementById('tsProject').value = '';
     document.getElementById('tsHours').value = '';
     document.getElementById('tsTask').value = '';
     document.getElementById('tsBillable').checked = true;
     document.getElementById('tsDate').valueAsDate = new Date();
-    setTimeout(() => msgEl.innerHTML = '', 4000);
     loadMyTimesheets();
   }
 
-  // Load my timesheets
   async function loadMyTimesheets() {
     const st = document.getElementById('statusFilter').value;
     let url = '/api/v1/timesheets/';
     if (st) url += '?status=' + st;
     const r = await apiFetch(url);
     const data = await r.json();
+
+    // Summary
+    document.getElementById('sumTotal').textContent = data.length;
+    document.getElementById('sumDraft').textContent = data.filter(t => t.status === 'Draft').length;
+    document.getElementById('sumSubmitted').textContent = data.filter(t => t.status === 'Submitted').length;
+    document.getElementById('sumApproved').textContent = data.filter(t => t.status === 'Approved').length;
+    const hrs = data.reduce((s, t) => s + parseFloat(t.hours || 0), 0);
+    document.getElementById('sumHours').textContent = hrs.toFixed(1) + 'h';
+
     const tbody = document.getElementById('myTimesheetsBody');
-    tbody.innerHTML = '';
     if (!data.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#aaa;">No timesheets found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><span class="empty-icon">📋</span><p>No timesheets yet. Add your first entry above.</p></div></td></tr>';
       return;
     }
-    data.forEach(ts => {
+
+    tbody.innerHTML = data.map(ts => {
       const isDraft = ts.status === 'Draft';
-      tbody.innerHTML += `<tr>
-        <td>${ts.date}</td>
-        <td>${ts.project_name || ts.project}</td>
-        <td>${ts.hours}h</td>
-        <td>${ts.is_billable ? '&#9989;' : '&#10060;'}</td>
-        <td title="${ts.task_description}">${ts.task_description.length > 35 ? ts.task_description.substring(0,35)+'...' : ts.task_description}</td>
+      return `<tr>
+        <td style="white-space:nowrap;">${ts.date}</td>
+        <td style="font-weight:600;">${ts.project_name || ts.project}</td>
+        <td style="font-weight:700;color:#86BC25;">${ts.hours}h</td>
+        <td>${ts.is_billable ? '<span style="color:#86BC25;font-weight:700;">● Billable</span>' : '<span style="color:#aaa;">○ Non-bill</span>'}</td>
+        <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${ts.task_description}">${ts.task_description}</td>
         <td>
-          <span class="status-badge badge-${ts.status}">${ts.status}</span>
-          ${ts.rejection_reason ? '<br><small style="color:#dc3545;font-size:11px;">'+ts.rejection_reason+'</small>' : ''}
+          <span class="badge badge-${ts.status}">${ts.status}</span>
+          ${ts.rejection_reason ? `<br><small style="color:#c62828;font-size:11px;">↳ ${ts.rejection_reason}</small>` : ''}
         </td>
         <td>
-          ${isDraft ? `
-            <button class="action-btn btn-submit-ts" onclick="submitOne(${ts.id})">Submit</button>
-            <button class="action-btn btn-delete" onclick="deleteOne(${ts.id})">Delete</button>
-          ` : '—'}
+          ${isDraft
+            ? `<button class="btn-ts btn-ts-submit" onclick="submitOne(${ts.id})">Submit</button>
+               <button class="btn-ts btn-ts-delete" onclick="deleteOne(${ts.id})">Delete</button>`
+            : '<span style="color:#ccc;font-size:12px;">—</span>'}
         </td>
       </tr>`;
-    });
+    }).join('');
   }
 
   async function submitOne(id) {
     if (!confirm('Submit this timesheet? You cannot edit it after submission.')) return;
     const r = await apiFetch('/api/v1/timesheets/' + id + '/submit/', { method: 'POST' });
     const d = await r.json();
-    alert(d.message || d.error);
+    showToast(d.message || d.error);
     loadMyTimesheets();
   }
 
   async function deleteOne(id) {
-    if (!confirm('Delete this draft timesheet?')) return;
+    if (!confirm('Delete this draft?')) return;
     await apiFetch('/api/v1/timesheets/' + id + '/', { method: 'DELETE' });
+    showToast('Draft deleted');
     loadMyTimesheets();
   }
 

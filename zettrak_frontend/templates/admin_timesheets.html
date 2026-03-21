@@ -7,127 +7,287 @@
   <title>Timesheets | ZetTrak Admin</title>
   <link rel="stylesheet" href="{% static 'app.css' %}" />
   <style>
-    .ts-filters { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
-    .ts-filters select, .ts-filters input { padding:8px 12px; border:1px solid #ddd; border-radius:6px; font-size:14px; }
-    .ts-filters button { padding:8px 18px; background:#86BC25; color:#000; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
-    .status-badge { padding:3px 10px; border-radius:12px; font-size:12px; font-weight:600; }
+    /* ── STAT CARDS ── */
+    .ts-stats { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin-bottom:28px; }
+    .ts-stat-card { background:#fff; border-radius:12px; padding:20px 18px; box-shadow:0 2px 10px rgba(0,0,0,0.07); border-top:4px solid #86BC25; }
+    .ts-stat-card.alt { border-top-color:#000; background:#f8f8f8; }
+    .ts-stat-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:#555; margin-bottom:8px; }
+    .ts-stat-value { font-size:30px; font-weight:800; color:#86BC25; line-height:1; }
+    .ts-stat-card.alt .ts-stat-value { color:#000; }
+    .ts-stat-sub { font-size:12px; color:#999; margin-top:4px; }
+
+    /* ── SECTION CARDS ── */
+    .ts-card { background:#fff; border-radius:14px; padding:24px 26px; box-shadow:0 2px 12px rgba(0,0,0,0.07); margin-bottom:24px; }
+    .ts-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:10px; }
+    .ts-card-title { font-size:16px; font-weight:700; color:#000; display:flex; align-items:center; gap:8px; }
+    .ts-card-title span { background:#86BC25; color:#000; padding:3px 10px; border-radius:20px; font-size:12px; }
+
+    /* ── PROJECT FORM ── */
+    .proj-form { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; align-items:flex-end; }
+    .proj-form-group { display:flex; flex-direction:column; gap:5px; flex:1; min-width:150px; }
+    .proj-form-group label { font-size:12px; font-weight:600; color:#555; text-transform:uppercase; letter-spacing:0.5px; }
+    .proj-form-group input, .proj-form-group select { padding:9px 12px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:14px; outline:none; transition:border-color 0.2s; }
+    .proj-form-group input:focus, .proj-form-group select:focus { border-color:#86BC25; }
+    .btn-add-proj { padding:9px 22px; background:#86BC25; color:#000; border:none; border-radius:8px; cursor:pointer; font-weight:700; font-size:14px; white-space:nowrap; height:40px; }
+    .btn-add-proj:hover { background:#6fa01e; }
+
+    /* ── FILTERS ── */
+    .ts-filters { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:16px; }
+    .filter-group { display:flex; flex-direction:column; gap:4px; }
+    .filter-group label { font-size:11px; font-weight:700; color:#777; text-transform:uppercase; letter-spacing:0.5px; }
+    .filter-group select, .filter-group input { padding:8px 12px; border:1.5px solid #e0e0e0; border-radius:8px; font-size:13px; outline:none; min-width:130px; transition:border-color 0.2s; }
+    .filter-group select:focus, .filter-group input:focus { border-color:#86BC25; }
+    .btn-filter { padding:8px 18px; background:#86BC25; color:#000; border:none; border-radius:8px; cursor:pointer; font-weight:700; font-size:13px; height:38px; }
+    .btn-clear { padding:8px 16px; background:#f0f0f0; color:#333; border:none; border-radius:8px; cursor:pointer; font-weight:600; font-size:13px; height:38px; }
+    .btn-filter:hover { background:#6fa01e; }
+    .btn-clear:hover { background:#e0e0e0; }
+
+    /* ── BULK BAR ── */
+    .bulk-bar { display:flex; gap:10px; align-items:center; padding:12px 16px; background:#f8f8f8; border-radius:8px; margin-bottom:14px; flex-wrap:wrap; border-left:4px solid #86BC25; }
+    .bulk-bar label { font-size:13px; font-weight:600; color:#333; display:flex; align-items:center; gap:6px; cursor:pointer; }
+    .bulk-bar input[type=checkbox] { width:16px; height:16px; cursor:pointer; accent-color:#86BC25; }
+    .btn-bulk-approve { padding:7px 16px; background:#86BC25; color:#000; border:none; border-radius:7px; cursor:pointer; font-weight:700; font-size:13px; }
+    .btn-bulk-reject { padding:7px 16px; background:#000; color:#fff; border:none; border-radius:7px; cursor:pointer; font-weight:700; font-size:13px; }
+    .btn-bulk-approve:hover { background:#6fa01e; }
+    .btn-bulk-reject:hover { background:#222; }
+    .bulk-msg { color:#86BC25; font-weight:700; font-size:13px; }
+
+    /* ── TABLE ── */
+    .ts-table { width:100%; border-collapse:collapse; font-size:13px; }
+    .ts-table thead tr { background:#000; color:#fff; }
+    .ts-table thead th { padding:12px 14px; text-align:left; font-size:12px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase; white-space:nowrap; }
+    .ts-table thead th:first-child { border-radius:8px 0 0 0; }
+    .ts-table thead th:last-child { border-radius:0 8px 0 0; }
+    .ts-table thead th input[type=checkbox] { accent-color:#86BC25; width:15px; height:15px; }
+    .ts-table tbody tr { border-bottom:1px solid #f0f0f0; transition:background 0.15s; }
+    .ts-table tbody tr:hover { background:#f9fff0; }
+    .ts-table tbody td { padding:12px 14px; color:#333; vertical-align:middle; }
+    .ts-table tbody td input[type=checkbox] { accent-color:#86BC25; width:15px; height:15px; }
+    .ts-table-wrap { overflow-x:auto; border-radius:10px; border:1px solid #f0f0f0; }
+
+    /* ── STATUS BADGES ── */
+    .badge { padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; display:inline-block; }
     .badge-Draft { background:#f0f0f0; color:#555; }
-    .badge-Submitted { background:#fff3cd; color:#856404; }
-    .badge-Approved { background:#d4edda; color:#155724; }
-    .badge-Rejected { background:#f8d7da; color:#721c24; }
-    .bulk-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
-    .bulk-bar button { padding:7px 16px; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
-    .btn-approve-bulk { background:#86BC25; color:#000; }
-    .btn-reject-bulk { background:#dc3545; color:#fff; }
-    .action-btn { padding:4px 10px; border:none; border-radius:5px; cursor:pointer; font-size:12px; font-weight:600; margin:0 2px; }
+    .badge-Submitted { background:#fff8e1; color:#f57c00; border:1px solid #ffe082; }
+    .badge-Approved { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; }
+    .badge-Rejected { background:#fce4ec; color:#c62828; border:1px solid #ef9a9a; }
+    .badge-Active { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; }
+    .badge-Inactive { background:#f0f0f0; color:#777; }
+
+    /* ── ACTION BUTTONS ── */
+    .btn-action { padding:5px 12px; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:700; transition:opacity 0.2s; }
     .btn-approve { background:#86BC25; color:#000; }
-    .btn-reject { background:#dc3545; color:#fff; }
-    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; }
+    .btn-reject { background:#000; color:#fff; }
+    .btn-del { background:#fce4ec; color:#c62828; }
+    .btn-action:hover { opacity:0.82; }
+
+    /* ── MODAL ── */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:2000; align-items:center; justify-content:center; }
     .modal-overlay.open { display:flex; }
-    .modal-box { background:#fff; border-radius:12px; padding:30px; width:90%; max-width:480px; }
-    .modal-box h3 { margin:0 0 16px; }
-    .modal-box textarea { width:100%; min-height:80px; padding:10px; border:1px solid #ddd; border-radius:6px; resize:vertical; }
-    .modal-box .modal-btns { display:flex; gap:10px; margin-top:14px; justify-content:flex-end; }
-    .modal-box .modal-btns button { padding:8px 20px; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
-    .btn-cancel { background:#eee; color:#333; }
-    .btn-confirm-reject { background:#dc3545; color:#fff; }
-    .projects-section { margin-bottom:30px; background:#fff; border-radius:10px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.06); }
-    .projects-section h3 { margin:0 0 14px; color:#1a2a3a; }
-    .proj-form { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
-    .proj-form input { flex:1; min-width:160px; padding:8px 12px; border:1px solid #ddd; border-radius:6px; }
-    .proj-form button { padding:8px 18px; background:#86BC25; color:#000; border:none; border-radius:6px; cursor:pointer; font-weight:600; }
+    .modal-box { background:#fff; border-radius:16px; padding:32px; width:90%; max-width:460px; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+    .modal-box h3 { margin:0 0 6px; font-size:18px; color:#000; }
+    .modal-box p { margin:0 0 18px; font-size:14px; color:#666; }
+    .modal-box textarea { width:100%; min-height:90px; padding:12px; border:1.5px solid #ddd; border-radius:8px; font-size:14px; resize:vertical; outline:none; box-sizing:border-box; }
+    .modal-box textarea:focus { border-color:#86BC25; }
+    .modal-btns { display:flex; gap:10px; margin-top:16px; justify-content:flex-end; }
+    .btn-modal-cancel { padding:9px 22px; background:#f0f0f0; color:#333; border:none; border-radius:8px; cursor:pointer; font-weight:600; }
+    .btn-modal-reject { padding:9px 22px; background:#000; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:700; }
+    .btn-modal-cancel:hover { background:#e0e0e0; }
+    .btn-modal-reject:hover { background:#222; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align:center; padding:48px 20px; color:#aaa; }
+    .empty-state .empty-icon { font-size:48px; margin-bottom:12px; display:block; }
+    .empty-state p { font-size:14px; }
+
+    /* ── TOAST ── */
+    .toast { position:fixed; bottom:24px; right:24px; background:#000; color:#86BC25; padding:12px 22px; border-radius:10px; font-weight:700; font-size:14px; z-index:9999; display:none; box-shadow:0 6px 20px rgba(0,0,0,0.2); }
+    .toast.show { display:block; animation:slideIn 0.3s ease; }
+    @keyframes slideIn { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+    @media(max-width:768px) {
+      .ts-stats { grid-template-columns:1fr 1fr; }
+      .ts-card { padding:16px; }
+      .proj-form { flex-direction:column; }
+      .ts-filters { flex-direction:column; }
+    }
   </style>
 </head>
 <body>
 
 {% with active_page='timesheets' %}{% include '_sidebar.html' %}{% endwith %}
 
-<div class="main-content">
-  <div class="topbar">
-    <h2 class="page-title">&#128203; Timesheets</h2>
-    <div class="topbar-right">
-      <span id="adminName" style="font-weight:600;"></span>
+<div class="main-wrapper">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h2>🕒 Timesheet Management</h2>
+      <p id="topbarSub">Manage projects, timesheets and approvals</p>
     </div>
-  </div>
-
-  <!-- Projects Section -->
-  <div class="projects-section">
-    <h3>&#128193; Projects</h3>
-    <div class="proj-form">
-      <input type="text" id="projName" placeholder="Project name" />
-      <select id="projCompany">
-        <option value="">Select Company</option>
-      </select>
-      <button onclick="addProject()">+ Add Project</button>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="font-size:13px;color:#888;" id="adminName"></span>
+      <span class="topbar-badge">⚙ Admin</span>
     </div>
-    <table class="data-table" id="projectsTable">
-      <thead><tr><th>ID</th><th>Project Name</th><th>Company</th><th>Status</th><th>Action</th></tr></thead>
-      <tbody id="projectsBody"><tr><td colspan="5" style="text-align:center;color:#aaa;">Loading...</td></tr></tbody>
-    </table>
-  </div>
+  </header>
 
-  <!-- Filters -->
-  <div class="panel">
-    <div class="ts-filters">
-      <select id="filterEmployee"><option value="">All Employees</option></select>
-      <select id="filterProject"><option value="">All Projects</option></select>
-      <input type="date" id="filterDate" />
-      <select id="filterStatus">
-        <option value="">All Status</option>
-        <option value="Draft">Draft</option>
-        <option value="Submitted">Submitted</option>
-        <option value="Approved">Approved</option>
-        <option value="Rejected">Rejected</option>
-      </select>
-      <button onclick="loadTimesheets()">&#128269; Filter</button>
-      <button onclick="clearFilters()" style="background:#eee;color:#333;">Clear</button>
+  <main class="content">
+
+    <!-- STAT CARDS -->
+    <div class="ts-stats" id="tsStats">
+      <div class="ts-stat-card">
+        <div class="ts-stat-label">Total Timesheets</div>
+        <div class="ts-stat-value" id="statTotal">—</div>
+        <div class="ts-stat-sub">All entries</div>
+      </div>
+      <div class="ts-stat-card alt">
+        <div class="ts-stat-label">Pending Review</div>
+        <div class="ts-stat-value" id="statSubmitted">—</div>
+        <div class="ts-stat-sub">Submitted timesheets</div>
+      </div>
+      <div class="ts-stat-card">
+        <div class="ts-stat-label">Approved</div>
+        <div class="ts-stat-value" id="statApproved">—</div>
+        <div class="ts-stat-sub">This period</div>
+      </div>
+      <div class="ts-stat-card alt">
+        <div class="ts-stat-label">Total Hours</div>
+        <div class="ts-stat-value" id="statHours">—</div>
+        <div class="ts-stat-sub">Logged hours</div>
+      </div>
     </div>
 
-    <!-- Bulk actions -->
-    <div class="bulk-bar">
-      <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" /> Select All
-      <button class="btn-approve-bulk" onclick="bulkAction('approve')">&#10003; Bulk Approve</button>
-      <button class="btn-reject-bulk" onclick="openBulkReject()">&#10007; Bulk Reject</button>
-      <span id="bulkMsg" style="color:#86BC25;font-weight:600;"></span>
+    <!-- PROJECTS MANAGEMENT -->
+    <div class="ts-card">
+      <div class="ts-card-header">
+        <div class="ts-card-title">📁 Projects <span id="projCount">0</span></div>
+      </div>
+      <div class="proj-form">
+        <div class="proj-form-group">
+          <label>Project Name</label>
+          <input type="text" id="projName" placeholder="e.g. HRMS Development" />
+        </div>
+        <div class="proj-form-group">
+          <label>Company</label>
+          <select id="projCompany"><option value="">Select Company</option></select>
+        </div>
+        <button class="btn-add-proj" onclick="addProject()">+ Add Project</button>
+      </div>
+      <div class="ts-table-wrap">
+        <table class="ts-table">
+          <thead>
+            <tr><th>#</th><th>Project Name</th><th>Company</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody id="projectsBody">
+            <tr><td colspan="5"><div class="empty-state"><span class="empty-icon">📁</span><p>No projects yet</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th><input type="checkbox" id="selectAllHead" onchange="toggleSelectAll(this)"/></th>
-          <th>Employee</th><th>Project</th><th>Date</th>
-          <th>Hours</th><th>Billable</th><th>Task</th>
-          <th>Status</th><th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="timesheetsBody">
-        <tr><td colspan="9" style="text-align:center;color:#aaa;">Loading...</td></tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- TIMESHEETS TABLE -->
+    <div class="ts-card">
+      <div class="ts-card-header">
+        <div class="ts-card-title">🕒 All Timesheets <span id="tsCount">0</span></div>
+      </div>
+
+      <!-- Filters -->
+      <div class="ts-filters">
+        <div class="filter-group">
+          <label>Employee</label>
+          <select id="filterEmployee"><option value="">All Employees</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Project</label>
+          <select id="filterProject"><option value="">All Projects</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Date</label>
+          <input type="date" id="filterDate" />
+        </div>
+        <div class="filter-group">
+          <label>Status</label>
+          <select id="filterStatus">
+            <option value="">All Status</option>
+            <option value="Draft">Draft</option>
+            <option value="Submitted">Submitted</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+        <button class="btn-filter" onclick="loadTimesheets()">🔍 Filter</button>
+        <button class="btn-clear" onclick="clearFilters()">✕ Clear</button>
+      </div>
+
+      <!-- Bulk Bar -->
+      <div class="bulk-bar">
+        <label>
+          <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" /> Select All
+        </label>
+        <button class="btn-bulk-approve" onclick="bulkAction('approve')">✔ Bulk Approve</button>
+        <button class="btn-bulk-reject" onclick="openBulkReject()">✕ Bulk Reject</button>
+        <span class="bulk-msg" id="bulkMsg"></span>
+      </div>
+
+      <!-- Table -->
+      <div class="ts-table-wrap">
+        <table class="ts-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" onchange="toggleSelectAll(this)" /></th>
+              <th>Employee</th>
+              <th>Project</th>
+              <th>Date</th>
+              <th>Hours</th>
+              <th>Billable</th>
+              <th>Task</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="timesheetsBody">
+            <tr><td colspan="9"><div class="empty-state"><span class="empty-icon">🕒</span><p>Loading timesheets...</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
 </div>
 
 <!-- Reject Modal -->
 <div class="modal-overlay" id="rejectModal">
   <div class="modal-box">
-    <h3>&#10007; Reject Timesheet</h3>
+    <h3>✕ Reject Timesheet</h3>
+    <p>Please provide a reason for rejection so the employee can revise their entry.</p>
     <textarea id="rejectReason" placeholder="Enter rejection reason..."></textarea>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-confirm-reject" onclick="confirmReject()">Reject</button>
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-modal-reject" onclick="confirmReject()">Reject</button>
     </div>
   </div>
 </div>
 
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
 <script>
-  const token = localStorage.getItem('accessToken');
-  if (!token || localStorage.getItem('userType') !== 'admin') {
-    window.location.href = '/login-page/';
-  }
+  const token = localStorage.getItem('accessToken') || localStorage.getItem('access');
+  if (!token || localStorage.getItem('userType') !== 'admin') window.location.href = '/login-page/';
   document.getElementById('adminName').textContent = localStorage.getItem('username') || 'Admin';
 
   let rejectTargetId = null;
   let rejectTargetBulk = false;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = '/login-page/';
+  }
 
   async function apiFetch(url, opts = {}) {
     return fetch(url, {
@@ -136,7 +296,6 @@
     });
   }
 
-  // ── Load employees for filter
   async function loadEmployeeFilter() {
     const r = await apiFetch('/api/v1/employees/');
     if (!r.ok) return;
@@ -150,7 +309,6 @@
     });
   }
 
-  // ── Load companies for project form
   async function loadCompanies() {
     const r = await apiFetch('/api/v1/companies/');
     if (!r.ok) return;
@@ -164,48 +322,51 @@
     });
   }
 
-  // ── Load projects
   async function loadProjects() {
     const r = await apiFetch('/api/v1/timesheets/projects/');
     if (!r.ok) return;
     const data = await r.json();
+    document.getElementById('projCount').textContent = data.length;
+
     const sel = document.getElementById('filterProject');
     sel.innerHTML = '<option value="">All Projects</option>';
-    const tbody = document.getElementById('projectsBody');
-    tbody.innerHTML = '';
     data.forEach(p => {
       const o = document.createElement('option');
-      o.value = p.id;
-      o.textContent = p.name;
+      o.value = p.id; o.textContent = p.name;
       sel.appendChild(o);
-
-      tbody.innerHTML += `<tr>
-        <td>${p.id}</td>
-        <td>${p.name}</td>
-        <td>${p.company}</td>
-        <td><span class="status-badge ${p.is_active ? 'badge-Approved' : 'badge-Rejected'}">${p.is_active ? 'Active' : 'Inactive'}</span></td>
-        <td><button class="action-btn btn-reject" onclick="deleteProject(${p.id})">Delete</button></td>
-      </tr>`;
     });
-    if (!data.length) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#aaa;">No projects yet</td></tr>';
+
+    const tbody = document.getElementById('projectsBody');
+    if (!data.length) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><span class="empty-icon">📁</span><p>No projects yet. Add one above.</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map((p, i) => `
+      <tr>
+        <td style="color:#999;font-size:12px;">${i + 1}</td>
+        <td style="font-weight:600;">${p.name}</td>
+        <td>${p.company}</td>
+        <td><span class="badge ${p.is_active ? 'badge-Active' : 'badge-Inactive'}">${p.is_active ? 'Active' : 'Inactive'}</span></td>
+        <td><button class="btn-action btn-del" onclick="deleteProject(${p.id})">Delete</button></td>
+      </tr>`).join('');
   }
 
   async function addProject() {
     const name = document.getElementById('projName').value.trim();
     const company = document.getElementById('projCompany').value;
-    if (!name || !company) return alert('Enter project name and select company');
+    if (!name || !company) return showToast('Enter project name and select company');
     const r = await apiFetch('/api/v1/timesheets/projects/', { method: 'POST', body: JSON.stringify({ name, company }) });
-    if (r.ok) { document.getElementById('projName').value = ''; await loadProjects(); }
-    else alert('Failed to add project');
+    if (r.ok) { document.getElementById('projName').value = ''; showToast('✔ Project added'); await loadProjects(); }
+    else showToast('Failed to add project');
   }
 
   async function deleteProject(id) {
     if (!confirm('Delete this project?')) return;
     await apiFetch('/api/v1/timesheets/projects/' + id + '/', { method: 'DELETE' });
+    showToast('Project deleted');
     loadProjects();
   }
 
-  // ── Load timesheets
   async function loadTimesheets() {
     const emp = document.getElementById('filterEmployee').value;
     const proj = document.getElementById('filterProject').value;
@@ -219,51 +380,61 @@
 
     const r = await apiFetch(url);
     const data = await r.json();
+
+    // Stats
+    document.getElementById('tsCount').textContent = data.length;
+    document.getElementById('statTotal').textContent = data.length;
+    document.getElementById('statSubmitted').textContent = data.filter(t => t.status === 'Submitted').length;
+    document.getElementById('statApproved').textContent = data.filter(t => t.status === 'Approved').length;
+    const totalHours = data.reduce((s, t) => s + parseFloat(t.hours || 0), 0);
+    document.getElementById('statHours').textContent = totalHours.toFixed(1) + 'h';
+
     const tbody = document.getElementById('timesheetsBody');
-    tbody.innerHTML = '';
     if (!data.length) {
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#aaa;">No timesheets found</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><span class="empty-icon">🕒</span><p>No timesheets found</p></div></td></tr>';
       return;
     }
-    data.forEach(ts => {
+    tbody.innerHTML = data.map(ts => {
       const canAct = ts.status === 'Submitted';
-      tbody.innerHTML += `<tr>
+      return `<tr>
         <td><input type="checkbox" class="ts-check" value="${ts.id}" /></td>
-        <td>${ts.employee_name || ts.employee}</td>
+        <td style="font-weight:600;">${ts.employee_name || ts.employee}</td>
         <td>${ts.project_name || ts.project}</td>
         <td>${ts.date}</td>
-        <td>${ts.hours}h</td>
-        <td>${ts.is_billable ? '&#9989; Yes' : '&#10060; No'}</td>
-        <td title="${ts.task_description}">${ts.task_description.length > 40 ? ts.task_description.substring(0,40)+'...' : ts.task_description}</td>
-        <td><span class="status-badge badge-${ts.status}">${ts.status}</span>${ts.rejection_reason ? '<br><small style="color:#dc3545">'+ts.rejection_reason+'</small>' : ''}</td>
+        <td style="font-weight:700;color:#86BC25;">${ts.hours}h</td>
+        <td>${ts.is_billable ? '<span style="color:#86BC25;font-weight:700;">● Billable</span>' : '<span style="color:#999;">○ Non-bill</span>'}</td>
+        <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${ts.task_description}">${ts.task_description}</td>
         <td>
-          ${canAct ? `<button class="action-btn btn-approve" onclick="approveOne(${ts.id})">Approve</button>
-          <button class="action-btn btn-reject" onclick="openRejectOne(${ts.id})">Reject</button>` : '—'}
+          <span class="badge badge-${ts.status}">${ts.status}</span>
+          ${ts.rejection_reason ? `<br><small style="color:#c62828;font-size:10px;">↳ ${ts.rejection_reason}</small>` : ''}
+        </td>
+        <td>
+          ${canAct
+            ? `<button class="btn-action btn-approve" onclick="approveOne(${ts.id})">✔ Approve</button>
+               <button class="btn-action btn-reject" onclick="openRejectOne(${ts.id})" style="margin-top:4px;">✕ Reject</button>`
+            : '<span style="color:#ccc;font-size:12px;">—</span>'}
         </td>
       </tr>`;
-    });
+    }).join('');
   }
 
   function clearFilters() {
-    document.getElementById('filterEmployee').value = '';
-    document.getElementById('filterProject').value = '';
-    document.getElementById('filterDate').value = '';
-    document.getElementById('filterStatus').value = '';
+    ['filterEmployee','filterProject','filterDate','filterStatus'].forEach(id => {
+      const el = document.getElementById(id);
+      el.value = '';
+    });
     loadTimesheets();
   }
 
-  // ── Approve single
   async function approveOne(id) {
     const r = await apiFetch('/api/v1/timesheets/' + id + '/approve/', { method: 'POST' });
     const d = await r.json();
-    alert(d.message || d.error);
+    showToast(d.message || d.error);
     loadTimesheets();
   }
 
-  // ── Reject single
   function openRejectOne(id) {
-    rejectTargetId = id;
-    rejectTargetBulk = false;
+    rejectTargetId = id; rejectTargetBulk = false;
     document.getElementById('rejectReason').value = '';
     document.getElementById('rejectModal').classList.add('open');
   }
@@ -276,44 +447,38 @@
 
   function closeModal() {
     document.getElementById('rejectModal').classList.remove('open');
-    rejectTargetId = null;
-    rejectTargetBulk = false;
+    rejectTargetId = null; rejectTargetBulk = false;
   }
 
   async function confirmReject() {
     const reason = document.getElementById('rejectReason').value.trim();
-    if (!reason) return alert('Please enter a rejection reason');
+    if (!reason) return showToast('Please enter a rejection reason');
     if (rejectTargetBulk) {
       await bulkAction('reject', reason);
     } else {
-      const r = await apiFetch('/api/v1/timesheets/' + rejectTargetId + '/reject/', {
-        method: 'POST', body: JSON.stringify({ rejection_reason: reason })
-      });
+      const r = await apiFetch('/api/v1/timesheets/' + rejectTargetId + '/reject/', { method: 'POST', body: JSON.stringify({ rejection_reason: reason }) });
       const d = await r.json();
-      alert(d.message || d.error);
+      showToast(d.message || d.error);
       loadTimesheets();
     }
     closeModal();
   }
 
-  // ── Bulk actions
   function toggleSelectAll(cb) {
     document.querySelectorAll('.ts-check').forEach(c => c.checked = cb.checked);
   }
 
   async function bulkAction(action, reason) {
     const ids = [...document.querySelectorAll('.ts-check:checked')].map(c => parseInt(c.value));
-    if (!ids.length) return alert('Select at least one timesheet');
+    if (!ids.length) return showToast('Select at least one timesheet');
     const body = { action, ids };
     if (reason) body.rejection_reason = reason;
     const r = await apiFetch('/api/v1/timesheets/bulk-action/', { method: 'POST', body: JSON.stringify(body) });
     const d = await r.json();
-    document.getElementById('bulkMsg').textContent = d.message || d.error;
-    setTimeout(() => document.getElementById('bulkMsg').textContent = '', 3000);
+    showToast(d.message || d.error);
     loadTimesheets();
   }
 
-  // ── Init
   loadEmployeeFilter();
   loadCompanies();
   loadProjects();
