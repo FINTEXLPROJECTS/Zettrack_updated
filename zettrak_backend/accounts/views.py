@@ -22,6 +22,10 @@ def contact_page(request):
     return render(request, 'contact.html')
 
 
+def pricing_page(request):
+    return render(request, 'pricing.html')
+
+
 # ── Auth page ──
 
 def login_page(request):
