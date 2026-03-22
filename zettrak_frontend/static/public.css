@@ -956,8 +956,8 @@ body {
    PRICING PAGE
 ═══════════════════════════ */
 .pricing-hero {
-  background: #000000;
-  color: #ffffff;
+  background: #ffffff;
+  color: #000000;
   text-align: center;
   padding: 80px 28px 60px;
 }
@@ -966,7 +966,7 @@ body {
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 800;
   margin-bottom: 16px;
-  color: #ffffff;
+  color: #000000;
 }
 
 .pricing-hero h1 span {
@@ -975,7 +975,7 @@ body {
 
 .pricing-hero p {
   font-size: 1.1rem;
-  color: rgba(255,255,255,0.8);
+  color: #555555;
   max-width: 560px;
   margin: 0 auto;
 }
